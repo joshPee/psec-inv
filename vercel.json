@@ -1,0 +1,6 @@
+{
+  "buildCommand": "cd cocobod-app && npm run build:with-db",
+  "outputDirectory": "cocobod-app/.next",
+  "framework": "nextjs",
+  "installCommand": "cd cocobod-app && npm install"
+}
