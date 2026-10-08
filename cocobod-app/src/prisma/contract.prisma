@@ -1,0 +1,190 @@
+// use prisma-next
+
+enum UserRole {
+  SECURITY_SUPERVISOR
+  EQUIPMENT_CUSTODIAN
+}
+
+enum EquipmentStatus {
+  AVAILABLE
+  ISSUED
+  RETURNED
+  DAMAGED
+  MISSING
+}
+
+enum IssueStatus {
+  ISSUED
+  PARTIALLY_RETURNED
+  FULLY_RETURNED
+}
+
+enum MovementAction {
+  ISSUED
+  RETURNED
+  DAMAGED
+  MISSING
+}
+
+enum Condition {
+  GOOD
+  SLIGHTLY_DAMAGED
+  DAMAGED
+  MISSING
+}
+
+enum RecordStatus {
+  ACTIVE
+  RESOLVED
+  ARCHIVED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  fullName     String
+  staffId      String   @unique
+  username     String   @unique
+  passwordHash String
+  role         UserRole
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  issuedEquipment     EquipmentIssue[]     @relation("CustodianIssues")
+  receivedEquipment   EquipmentIssueItem[] @relation("CustodianReturns")
+  recordedDamaged     DamagedEquipmentRecord[]
+  recordedMissing     MissingEquipmentRecord[]
+  movements           EquipmentMovement[]
+}
+
+model Guard {
+  id        String   @id @default(cuid())
+  fullName  String
+  badgeId   String   @unique
+  staffId   String?
+  contact   String?
+  isActive  Boolean  @default(true)
+  team      String?
+  shift     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  issues     EquipmentIssue[]
+  movements  EquipmentMovement[]
+  damaged    DamagedEquipmentRecord[]
+  missing    MissingEquipmentRecord[]
+}
+
+model EquipmentCategory {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+
+  equipment Equipment[]
+}
+
+model Equipment {
+  id                String             @id @default(cuid())
+  itemCode          String             @unique
+  itemName          String
+  categoryId        String
+  totalQuantity     Int                @default(0)
+  availableQuantity Int                @default(0)
+  issuedQuantity    Int                @default(0)
+  damagedQuantity   Int                @default(0)
+  missingQuantity   Int                @default(0)
+  defaultCondition  Condition          @default(GOOD)
+  storageLocation   String?
+  remarks           String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  category           EquipmentCategory       @relation(fields: [categoryId], references: [id])
+  issueItems         EquipmentIssueItem[]
+  movements          EquipmentMovement[]
+  damagedRecords     DamagedEquipmentRecord[]
+  missingRecords     MissingEquipmentRecord[]
+}
+
+model EquipmentIssue {
+  id          String     @id @default(cuid())
+  guardId     String
+  custodianId String
+  issuedAt    DateTime   @default(now())
+  dutyPoint   String?
+  remarks     String?
+  status      IssueStatus @default(ISSUED)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime @updatedAt
+
+  guard     Guard               @relation(fields: [guardId], references: [id])
+  custodian User                @relation("CustodianIssues", fields: [custodianId], references: [id])
+  items     EquipmentIssueItem[]
+}
+
+model EquipmentIssueItem {
+  id                 String      @id @default(cuid())
+  issueId            String
+  equipmentId        String
+  quantityIssued     Int
+  quantityReturned   Int         @default(0)
+  quantityOutstanding Int
+  conditionAtIssue   Condition
+  conditionAtReturn  Condition?
+  returnedAt         DateTime?
+  returnedBy         String?
+  remarks            String?
+
+  issue     Equipment @relation(fields: [equipmentId], references: [id])
+  issueRecord EquipmentIssue @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  custodian User      @relation("CustodianReturns", fields: [returnedBy], references: [id])
+}
+
+model EquipmentMovement {
+  id          String        @id @default(cuid())
+  equipmentId String
+  guardId     String
+  custodianId String
+  action      MovementAction
+  quantity    Int
+  condition   Condition?
+  dutyPoint   String?
+  remarks     String?
+  createdAt   DateTime      @default(now())
+
+  equipment Equipment @relation(fields: [equipmentId], references: [id])
+  guard     Guard     @relation(fields: [guardId], references: [id])
+  custodian User      @relation(fields: [custodianId], references: [id])
+}
+
+model DamagedEquipmentRecord {
+  id          String      @id @default(cuid())
+  equipmentId String
+  guardId     String
+  quantity    Int
+  condition   Condition
+  remarks     String?
+  recordedBy  String
+  recordedAt  DateTime    @default(now())
+  status      RecordStatus @default(ACTIVE)
+
+  equipment Equipment @relation(fields: [equipmentId], references: [id])
+  guard     Guard     @relation(fields: [guardId], references: [id])
+  recorder  User      @relation("RecordedDamaged", fields: [recordedBy], references: [id])
+}
+
+model MissingEquipmentRecord {
+  id          String      @id @default(cuid())
+  equipmentId String
+  guardId     String
+  quantity    Int
+  remarks     String?
+  recordedBy  String
+  recordedAt  DateTime    @default(now())
+  status      RecordStatus @default(ACTIVE)
+
+  equipment Equipment @relation(fields: [equipmentId], references: [id])
+  guard     Guard     @relation(fields: [guardId], references: [id])
+  recorder  User      @relation("RecordedMissing", fields: [recordedBy], references: [id])
+}

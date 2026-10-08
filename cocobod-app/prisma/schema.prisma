@@ -1,0 +1,286 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  SECURITY_SUPERVISOR
+  EQUIPMENT_CUSTODIAN
+}
+
+enum GuardStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum IssueStatus {
+  ISSUED
+  PARTIALLY_RETURNED
+  FULLY_RETURNED
+}
+
+enum BookingStatus {
+  PENDING
+  APPROVED
+  FULFILLED
+  REJECTED
+  EXPIRED
+  CANCELLED
+}
+
+enum MovementAction {
+  BOOKED
+  ISSUED
+  RETURNED
+  DAMAGED
+  MISSING
+  EXPIRED
+  ADJUSTED
+}
+
+enum Condition {
+  GOOD
+  SLIGHTLY_DAMAGED
+  DAMAGED
+  MISSING
+}
+
+enum RecordStatus {
+  ACTIVE
+  RESOLVED
+  ARCHIVED
+}
+
+enum NotificationType {
+  LOW_STOCK
+  DAMAGED
+  MISSING
+  ISSUE
+  RETURN
+  SYSTEM
+}
+
+model User {
+  id            String   @id @default(cuid())
+  fullName      String
+  staffId       String   @unique
+  username      String   @unique
+  email         String   @unique
+  passwordHash  String
+  role          UserRole
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  issuedEquipment    EquipmentIssue[]        @relation("Custodian")
+  movements          EquipmentMovement[]     @relation("MovedBy")
+  recordedDamaged    DamagedEquipmentRecord[]
+  recordedMissing    MissingEquipmentRecord[]
+  notifications      Notification[]
+  decidedBookings    EquipmentBooking[]      @relation("DecidedBy")
+
+  @@map("users")
+}
+
+model Guard {
+  id        String      @id @default(cuid())
+  fullName  String
+  badgeId   String      @unique
+  staffId   String?
+  contact   String?
+  status    GuardStatus @default(ACTIVE)
+  team      String?
+  shift     String?
+  photoUrl  String?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  bookings   EquipmentBooking[]
+  issues     EquipmentIssue[]
+  movements  EquipmentMovement[]
+  damaged    DamagedEquipmentRecord[]
+  missing    MissingEquipmentRecord[]
+
+  @@map("guards")
+}
+
+model EquipmentCategory {
+  id          String              @id @default(cuid())
+  name        String
+  description String?
+  isActive    Boolean             @default(true)
+  parentId    String?
+  parent      EquipmentCategory?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children    EquipmentCategory[] @relation("CategoryHierarchy")
+  lowStockThreshold Int @default(5)
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  equipment Equipment[]
+
+  @@map("equipment_categories")
+}
+
+model Equipment {
+  id               String            @id @default(cuid())
+  itemCode         String            @unique
+  itemName         String
+  categoryId       String
+  category         EquipmentCategory @relation(fields: [categoryId], references: [id])
+  totalQuantity     Int
+  availableQuantity Int
+  reservedQuantity  Int @default(0)
+  issuedQuantity    Int @default(0)
+  damagedQuantity   Int @default(0)
+  missingQuantity   Int @default(0)
+  lowStockThreshold Int @default(0)
+  defaultCondition Condition @default(GOOD)
+  storageLocation  String?
+  remarks          String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  bookings       EquipmentBooking[]
+  issueItems     EquipmentIssueItem[]
+  movements      EquipmentMovement[]
+  damagedRecords DamagedEquipmentRecord[]
+  missingRecords MissingEquipmentRecord[]
+
+  @@map("equipment")
+}
+
+
+
+model EquipmentIssue {
+  id          String      @id @default(cuid())
+  guardId     String
+  guard       Guard       @relation(fields: [guardId], references: [id])
+  custodianId String
+  custodian   User        @relation("Custodian", fields: [custodianId], references: [id])
+  shift       String?
+  dutyPoint   String?
+  expectedReturnDate DateTime?
+  status      IssueStatus @default(ISSUED)
+  issuedAt    DateTime    @default(now())
+  remarks     String?
+
+  items   EquipmentIssueItem[]
+  booking EquipmentBooking?
+
+  @@map("equipment_issues")
+}
+
+model EquipmentIssueItem {
+  id            String     @id @default(cuid())
+  issueId       String
+  issue         EquipmentIssue @relation(fields: [issueId], references: [id])
+  equipmentId   String
+  equipment     Equipment  @relation(fields: [equipmentId], references: [id])
+  quantityIssued    Int
+  quantityReturned  Int @default(0)
+  quantityOutstanding Int
+  conditionAtIssue  Condition
+  conditionAtReturn Condition?
+  returnedAt        DateTime?
+  remarks           String?
+
+  @@map("equipment_issue_items")
+}
+
+model EquipmentMovement {
+  id          String         @id @default(cuid())
+  equipmentId String
+  equipment   Equipment      @relation(fields: [equipmentId], references: [id])
+  guardId     String?
+  guard       Guard?         @relation(fields: [guardId], references: [id])
+  movedById   String
+  movedBy     User           @relation("MovedBy", fields: [movedById], references: [id])
+  action      MovementAction
+  quantity    Int
+  condition   Condition?
+  dutyPoint   String?
+  remarks     String?
+  createdAt   DateTime       @default(now())
+
+  @@map("equipment_movements")
+}
+
+model DamagedEquipmentRecord {
+  id          String       @id @default(cuid())
+  equipmentId String
+  equipment   Equipment    @relation(fields: [equipmentId], references: [id])
+  guardId     String?
+  guard       Guard?       @relation(fields: [guardId], references: [id])
+  quantity    Int
+  condition   Condition
+  damageDescription String?
+  resolutionStatus String? @default("PENDING_INVESTIGATION")
+  resolutionNotes String?
+  remarks     String?
+  recordedById String
+  recordedBy   User        @relation(fields: [recordedById], references: [id])
+  recordedAt   DateTime    @default(now())
+  status       RecordStatus @default(ACTIVE)
+
+  @@map("damaged_equipment_records")
+}
+
+model MissingEquipmentRecord {
+  id          String       @id @default(cuid())
+  equipmentId String
+  equipment   Equipment    @relation(fields: [equipmentId], references: [id])
+  guardId     String?
+  guard       Guard?       @relation(fields: [guardId], references: [id])
+  quantity    Int
+  investigationStatus String? @default("UNDER_INVESTIGATION")
+  resolutionNotes String?
+  remarks     String?
+  recordedById String
+  recordedBy   User        @relation(fields: [recordedById], references: [id])
+  recordedAt   DateTime    @default(now())
+  status       RecordStatus @default(ACTIVE)
+
+  @@map("missing_equipment_records")
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  title     String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("notifications")
+}
+
+model EquipmentBooking {
+  id                String        @id @default(cuid())
+  guardId           String
+  guard             Guard         @relation(fields: [guardId], references: [id])
+  equipmentId       String
+  equipment         Equipment     @relation(fields: [equipmentId], references: [id])
+  quantityRequested Int
+  requestedFor      DateTime
+  dutyPoint         String?
+  shift             String?
+  status            BookingStatus @default(PENDING)
+  decidedById       String?
+  decidedBy         User?         @relation("DecidedBy", fields: [decidedById], references: [id])
+  decidedAt         DateTime?
+  expiresAt         DateTime?
+  remarks           String?
+  createdAt         DateTime      @default(now())
+
+  fulfilledIssueId  String?         @unique
+  fulfilledIssue    EquipmentIssue? @relation(fields: [fulfilledIssueId], references: [id])
+
+  @@map("equipment_bookings")
+}
