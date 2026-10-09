@@ -538,8 +538,8 @@ export default function ActiveIssuedClient({ activeItems, userRole }: ActiveIssu
               )}
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left">
+            <div className="overflow-x-auto -mx-4 px-4">
+              <table className="w-full text-left min-w-[800px]">
                 <thead>
                   <tr className="border-b border-slate-200/80 dark:border-slate-800/80 bg-slate-50/80 dark:bg-slate-800/50">
                     <th className="py-3 px-4 font-semibold text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider">Guard</th>
@@ -655,7 +655,7 @@ export default function ActiveIssuedClient({ activeItems, userRole }: ActiveIssu
       {/* Return Equipment Dialog - Only for Custodians */}
       {isCustodian && (
         <Dialog open={isReturnDialogOpen} onOpenChange={setIsReturnDialogOpen}>
-          <DialogContent className="max-w-lg bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
+          <DialogContent className="max-w-lg bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 [&>[data-radix-dialog-close]]:hidden">
             <DialogHeader>
               <div className="flex items-center gap-3 mb-1">
                 <div className="p-2 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400">
