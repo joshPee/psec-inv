@@ -241,8 +241,8 @@ export function MobileBottomNav() {
 
       {/* More Modal - Bottom Sheet */}
       <Dialog open={isMoreOpen} onOpenChange={setIsMoreOpen}>
-        <DialogContent 
-          className="fixed left-0 right-0 bottom-0 top-auto translate-x-0 translate-y-0 rounded-t-2xl rounded-b-none max-h-[75vh] overflow-y-auto bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 m-0 w-full max-w-none"
+        <DialogContent
+          className="fixed left-0 right-0 bottom-0 top-auto translate-x-0 translate-y-0 rounded-t-2xl rounded-b-none max-h-[75vh] overflow-y-auto bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 m-0 w-full max-w-none [&>[data-radix-dialog-close]]:hidden"
         >
           <DialogHeader className="flex flex-row items-center justify-between space-y-0 pb-4 px-4 pt-4">
             <DialogTitle className="text-lg font-semibold">More Options</DialogTitle>

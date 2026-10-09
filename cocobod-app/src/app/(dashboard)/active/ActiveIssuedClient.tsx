@@ -340,7 +340,7 @@ export default function ActiveIssuedClient({ activeItems, userRole }: ActiveIssu
       </div>
 
       {/* Tab Navigation */}
-      <div className="flex gap-2">
+      <div className="flex gap-2 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide">
         <Button
           variant={activeTab === 'all' ? 'default' : 'outline'}
           onClick={() => {
