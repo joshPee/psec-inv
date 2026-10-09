@@ -7,11 +7,16 @@ import { SessionProvider } from 'next-auth/react'
 import { DashboardSidebar } from '@/components/DashboardSidebar'
 import { DashboardTopBar } from '@/components/DashboardTopBar'
 import { MobileBottomNav } from '@/components/MobileBottomNav'
+import { OfflineIndicator } from '@/components/mobile'
+import { useMobileKeyboard } from '@/hooks/useMobileKeyboard'
 
 function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
   const { data: session } = useSession()
   const router = useRouter()
   const isSupervisor = session?.user?.role === 'SECURITY_SUPERVISOR'
+
+  // Initialize mobile keyboard handling
+  useMobileKeyboard()
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -28,6 +33,9 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex h-screen bg-slate-50 dark:bg-slate-950 overflow-hidden">
+      {/* Offline Indicator for mobile */}
+      <OfflineIndicator />
+
       {/* Sidebar - Hidden on mobile, visible on desktop */}
       <div className="hidden lg:block">
         <DashboardSidebar />

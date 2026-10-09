@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useSession } from 'next-auth/react'
+import { useTheme } from 'next-themes'
 import {
   LayoutDashboard,
   Package,
@@ -16,10 +17,12 @@ import {
   UserCog,
   Plus,
   X,
-  MoreHorizontal
+  MoreHorizontal,
+  Sun,
+  Moon
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -75,12 +78,50 @@ function getMoreItems(role?: string): NavItem[] {
 export function MobileBottomNav() {
   const pathname = usePathname()
   const { data: session } = useSession()
+  const { theme, setTheme } = useTheme()
   const [isMoreOpen, setIsMoreOpen] = useState(false)
   const [isFabOpen, setIsFabOpen] = useState(false)
+  const [pendingBookingsCount, setPendingBookingsCount] = useState(0)
+  const [overdueCount, setOverdueCount] = useState(0)
   const bottomNavItems = getBottomNavItems(session?.user?.role)
   const moreItems = getMoreItems(session?.user?.role)
   const isCustodian = session?.user?.role === 'EQUIPMENT_CUSTODIAN'
   const isSupervisor = session?.user?.role === 'SECURITY_SUPERVISOR'
+
+  // Fetch badge counts
+  useEffect(() => {
+    async function fetchCounts() {
+      try {
+        const [bookingsRes, activeRes] = await Promise.all([
+          fetch('/api/bookings'),
+          fetch('/api/equipment/active')
+        ])
+
+        if (bookingsRes.ok) {
+          const bookings = await bookingsRes.json()
+          const pending = bookings.filter((b: any) => b.status === 'PENDING').length
+          setPendingBookingsCount(pending)
+        }
+
+        if (activeRes.ok) {
+          const active = await activeRes.json()
+          const overdue = active.filter((a: any) => a.isOverdue).length
+          setOverdueCount(overdue)
+        }
+      } catch (error) {
+        console.error('Error fetching badge counts:', error)
+      }
+    }
+
+    fetchCounts()
+    // Refresh counts every 30 seconds
+    const interval = setInterval(fetchCounts, 30000)
+    return () => clearInterval(interval)
+  }, [])
+
+  const handleNavClick = () => {
+    if (navigator.vibrate) navigator.vibrate(10)
+  }
 
   return (
     <>
@@ -89,21 +130,33 @@ export function MobileBottomNav() {
         <div className="flex items-center justify-around h-16 px-2 safe-area-bottom">
           {bottomNavItems.map((item) => {
             const isActive = pathname === item.href
+            const badgeCount = item.href === '/bookings' ? pendingBookingsCount
+                            : item.href === '/active' ? overdueCount
+                            : 0
+
             return (
               <Link
                 key={item.name}
                 href={item.href}
+                onClick={handleNavClick}
                 className={cn(
-                  'flex flex-col items-center justify-center w-full h-full min-w-0 px-1',
+                  'flex flex-col items-center justify-center w-full h-full min-w-0 px-1 relative',
                   'transition-colors duration-200'
                 )}
               >
-                <item.icon
-                  className={cn(
-                    'h-5 w-5 mb-1 transition-colors',
-                    isActive ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400'
+                <div className="relative">
+                  <item.icon
+                    className={cn(
+                      'h-5 w-5 mb-1 transition-colors',
+                      isActive ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400'
+                    )}
+                  />
+                  {badgeCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-rose-500 text-white text-[10px] rounded-full h-4 w-4 flex items-center justify-center font-medium">
+                      {badgeCount > 9 ? '9+' : badgeCount}
+                    </span>
                   )}
-                />
+                </div>
                 <span
                   className={cn(
                     'text-[10px] font-medium leading-tight truncate max-w-full',
@@ -116,7 +169,10 @@ export function MobileBottomNav() {
             )
           })}
           <button
-            onClick={() => setIsMoreOpen(true)}
+            onClick={() => {
+              if (navigator.vibrate) navigator.vibrate(10)
+              setIsMoreOpen(true)
+            }}
             className={cn(
               'flex flex-col items-center justify-center w-full h-full min-w-0 px-1',
               'transition-colors duration-200'
@@ -202,7 +258,10 @@ export function MobileBottomNav() {
                 <Link
                   key={item.name}
                   href={item.href}
-                  onClick={() => setIsMoreOpen(false)}
+                  onClick={() => {
+                    if (navigator.vibrate) navigator.vibrate(10)
+                    setIsMoreOpen(false)
+                  }}
                   className={cn(
                     'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
                     isActive
@@ -215,6 +274,23 @@ export function MobileBottomNav() {
                 </Link>
               )
             })}
+            {/* Theme Toggle */}
+            <button
+              onClick={() => {
+                if (navigator.vibrate) navigator.vibrate(10)
+                setTheme(theme === 'dark' ? 'light' : 'dark')
+              }}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+            >
+              {theme === 'dark' ? (
+                <Sun className="h-5 w-5" />
+              ) : (
+                <Moon className="h-5 w-5" />
+              )}
+              <span className="font-medium">
+                {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+              </span>
+            </button>
           </div>
         </DialogContent>
       </Dialog>

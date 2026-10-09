@@ -7,7 +7,7 @@ A **Security Equipment Management System** (SECMS) for managing security equipme
 
 ## Implementation Status
 
-**✅ Completed (15):** Guard Profile Page, Live Notifications, Low-Stock Alerts, QR Codes, Expected Return Date, Overdue Issues Tracker, Shift Handover Report, Inventory Restock Workflow, Condition Timeline, Bulk CSV Import, Advanced Analytics Charts, Guard Portal Enhancements, Guard Photos, Keyboard Shortcuts, Live Dashboard Updates
+**✅ Completed (30):** Guard Profile Page, Live Notifications, Low-Stock Alerts, QR Codes, Expected Return Date, Overdue Issues Tracker, Shift Handover Report, Inventory Restock Workflow, Condition Timeline, Bulk CSV Import, Advanced Analytics Charts, Guard Portal Enhancements, Guard Photos, Keyboard Shortcuts, Live Dashboard Updates, Mobile Card View for Tables, Pull-to-Refresh, Mobile Action Sheets, Swipe Actions, Enhanced Mobile Search, Bottom Nav Improvements (badges, haptic feedback), Mobile-Optimized Forms, Mobile Dashboard Sections, Mobile Navigation (breadcrumbs, back button), Virtual Scrolling, Mobile Animations, Mobile Theme Toggle, Mobile Keyboard Handling, Touch Targets (44px minimum), Offline Indicator
 **🟡 Partial (0):** None
 **❌ Not Started (0):** None
 
@@ -180,3 +180,180 @@ A **Security Equipment Management System** (SECMS) for managing security equipme
 | 13 | Guard Photo/Avatar | 🟢 Low | Low | Low | ✅ Done |
 | 14 | Keyboard Shortcuts | 🟢 Low | Low | Medium | ✅ Done |
 | 15 | Live Dashboard Updates | 🟢 Low | Low | Medium | ✅ Done |
+
+---
+
+## 📱 Mobile UI Improvements
+
+### 16. Mobile Card View for Tables
+**Status:** ✅ **COMPLETED** - Created `MobileCardView` component that transforms tables into mobile-friendly card views on small screens.
+**Why it matters:** Tables are cramped on mobile and require horizontal scrolling. Card views provide better UX.
+**What was built:**
+- `MobileCardView` component with column configuration
+- Automatic animation delays for staggered card appearance
+- Responsive: hidden on desktop, visible on mobile
+- Support for custom render functions per column
+
+### 17. Pull-to-Refresh
+**Status:** ✅ **COMPLETED** - Implemented `PullToRefresh` component with touch gesture support.
+**Why it matters:** Mobile users expect pull-to-refresh for real-time data updates.
+**What was built:**
+- Touch gesture detection (pull down to refresh)
+- Visual indicator with progress feedback
+- Resistance effect for natural feel
+- Auto-refresh callback support
+- Only activates at top of page
+
+### 18. Mobile Action Sheets
+**Status:** ✅ **COMPLETED** - Created `MobileActionSheet` component for bottom sheet dialogs.
+**Why it matters:** Dropdowns and modals can be awkward on mobile. Bottom sheets are more natural.
+**What was built:**
+- Bottom sheet dialog using Radix UI
+- Support for destructive actions (red color)
+- Haptic feedback on action selection
+- Smooth slide-up animation
+- Staggered animation for action items
+
+### 19. Swipe Actions
+**Status:** ✅ **COMPLETED** - Implemented `SwipeableListItem` component with gesture support.
+**Why it matters:** Mobile users expect swipe gestures for quick actions (like Gmail).
+**What was built:**
+- Left/right swipe detection using react-swipeable
+- Custom action backgrounds (left: green, right: red)
+- Haptic feedback on swipe completion
+- Smooth translation animations
+- Touch action configuration to prevent conflicts
+
+### 20. Enhanced Mobile Search
+**Status:** ✅ **COMPLETED** - Created `MobileSearchBar` with expandable full-screen mode.
+**Why it matters:** Search bars are often hidden or awkward on mobile.
+**What was built:**
+- Collapsible search bar (button → expanded input)
+- Auto-focus on expansion
+- Clear button for quick reset
+- Close button to collapse
+- Sticky positioning
+- 44px minimum touch targets
+
+### 21. Bottom Navigation Improvements
+**Status:** ✅ **COMPLETED** - Enhanced `MobileBottomNav` with badge counts and haptic feedback.
+**Why it matters:** Users need visibility into pending items and tactile feedback.
+**What was built:**
+- Badge counts for pending bookings and overdue items
+- Auto-refresh badge counts every 30 seconds
+- Haptic feedback on navigation (vibrate)
+- Theme toggle in More menu (light/dark mode)
+- Touch target compliance (44px minimum)
+
+### 22. Mobile-Optimized Forms
+**Status:** ✅ **COMPLETED** - Created `MobileFormModal` for full-screen form modals.
+**Why it matters:** Forms are cramped on mobile. Full-screen modals provide better UX.
+**What was built:**
+- Full-screen modals on mobile, normal modals on desktop
+- Sticky header on mobile
+- Auto-focus first input on open
+- Scrollable content area
+- Smooth slide-up animation
+- Keyboard handling support
+
+### 23. Mobile Dashboard Sections
+**Status:** ✅ **COMPLETED** - Created `MobileDashboardSection` for collapsible sections.
+**Why it matters:** Dashboard is information-dense on mobile. Collapsible sections help.
+**What was built:**
+- Collapsible card sections with chevron indicator
+- Default open/close configuration
+- Smooth rotation animation
+- Touch target compliance
+- Only visible on mobile
+
+### 24. Mobile Navigation Enhancements
+**Status:** ✅ **COMPLETED** - Created `MobileBreadcrumbs` with back button.
+**Why it matters:** Deep navigation is difficult on mobile without breadcrumbs.
+**What was built:**
+- Breadcrumb navigation with path segments
+- Back button with browser history
+- Path segment display
+- Only visible on mobile
+- Touch target compliance
+
+### 25. Virtual Scrolling
+**Status:** ✅ **COMPLETED** - Created `VirtualizedList` component using @tanstack/react-virtual.
+**Why it matters:** Long lists cause performance issues on mobile. Virtual scrolling helps.
+**What was built:**
+- Virtual scrolling for large lists
+- Configurable item height estimation
+- Overscan configuration for smooth scrolling
+- Customizable render function
+- Performance optimization for 100+ items
+
+### 26. Mobile Animations
+**Status:** ✅ **COMPLETED** - Added mobile-specific animations to globals.css.
+**Why it matters:** Subtle animations make the app feel native on mobile.
+**What was built:**
+- `mobile-slide-up` - Bottom sheet animation
+- `mobile-fade-in` - Fade in animation
+- `mobile-scale-in` - Scale in animation
+- CSS keyframes for each animation
+- Applied to mobile components
+
+### 27. Mobile Theme Toggle
+**Status:** ✅ **COMPLETED** - Added theme toggle to MobileBottomNav More menu.
+**Why it matters:** Easy dark mode switching is expected on mobile.
+**What was built:**
+- Theme toggle button in More menu
+- Uses next-themes
+- Sun/Moon icon based on current theme
+- Haptic feedback on toggle
+- Touch target compliance
+
+### 28. Mobile Keyboard Handling
+**Status:** ✅ **COMPLETED** - Created `useMobileKeyboard` hook and CSS fixes.
+**Why it matters:** Mobile keyboard often covers inputs on mobile.
+**What was built:**
+- `useMobileKeyboard` hook for viewport handling
+- CSS variable for viewport height
+- Dynamic viewport height updates
+- Visual viewport API support
+- Orientation change handling
+
+### 29. Touch Targets
+**Status:** ✅ **COMPLETED** - Added touch target CSS to globals.css.
+**Why it matters:** Apple guidelines require 44px minimum touch targets.
+**What was built:**
+- `.touch-target` class with 44px minimum
+- Applied to buttons, links, inputs, selects, textareas
+- Special handling for smaller elements
+- Global CSS application
+
+### 30. Offline Indicator
+**Status:** ✅ **COMPLETED** - Created `OfflineIndicator` component.
+**Why it matters:** Users need to know when they're offline.
+**What was built:**
+- Network status detection
+- Amber warning banner at top
+- Wifi icon indicator
+- Only visible on mobile
+- Safe area top padding
+- Auto-update on network change
+
+---
+
+## Mobile UI Summary Table
+
+|| # | Feature | Priority | Effort | Impact | Status |
+||---|---------|----------|--------|--------|--------|
+|| 16 | Mobile Card View | 🔴 High | Medium | Critical | ✅ Done |
+|| 17 | Pull-to-Refresh | 🔴 High | Low | High | ✅ Done |
+|| 18 | Mobile Action Sheets | 🔴 High | Medium | High | ✅ Done |
+|| 19 | Swipe Actions | 🟡 Medium | High | High | ✅ Done |
+|| 20 | Enhanced Mobile Search | 🔴 High | Low | Medium | ✅ Done |
+|| 21 | Bottom Nav Improvements | 🟡 Medium | Low | Medium | ✅ Done |
+|| 22 | Mobile-Optimized Forms | 🔴 High | Medium | High | ✅ Done |
+|| 23 | Mobile Dashboard Sections | 🟡 Medium | Low | High | ✅ Done |
+|| 24 | Mobile Navigation | 🟡 Medium | Low | Medium | ✅ Done |
+|| 25 | Virtual Scrolling | 🟡 Medium | High | High | ✅ Done |
+|| 26 | Mobile Animations | 🟢 Low | Low | Low | ✅ Done |
+|| 27 | Mobile Theme Toggle | 🟢 Low | Low | Low | ✅ Done |
+|| 28 | Mobile Keyboard Handling | 🟡 Medium | Low | Medium | ✅ Done |
+|| 29 | Touch Targets | 🔴 High | Low | Critical | ✅ Done |
+|| 30 | Offline Indicator | 🟢 Low | Low | Medium | ✅ Done |

@@ -266,6 +266,46 @@
 .animation-delay-5 { animation-delay: 300ms; }
 .animation-delay-6 { animation-delay: 360ms; }
 
+/* Mobile-specific animations */
+@keyframes mobileSlideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes mobileFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes mobileScaleIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.mobile-slide-up {
+  animation: mobileSlideUp 0.3s ease-out;
+}
+
+.mobile-fade-in {
+  animation: mobileFadeIn 0.2s ease-out;
+}
+
+.mobile-scale-in {
+  animation: mobileScaleIn 0.25s ease-out;
+}
+
 /* ================================================================
    DASHBOARD AREA GRADIENT BACKGROUND
    ================================================================ */
@@ -472,4 +512,38 @@ body:has([role="dialog"][data-state="open"]) header[data-topbar="true"] {
 
 .safe-area-top {
   padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* Touch targets for mobile (44px minimum per Apple guidelines) */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Ensure buttons, links, and inputs meet touch target size */
+button, a, input, select, textarea {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* For smaller elements, use padding to meet minimum */
+button-sm, a-sm {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0.5rem 1rem;
+}
+
+/* Mobile keyboard handling - prevent keyboard from covering inputs */
+:root {
+  --viewport-height: 100vh;
+}
+
+body {
+  height: 100vh;
+  height: var(--viewport-height, 100vh);
+  min-height: 100vh;
+}
+
+html {
+  height: 100%;
 }
