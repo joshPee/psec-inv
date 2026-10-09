@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { SessionProvider } from 'next-auth/react'
 import { DashboardSidebar } from '@/components/DashboardSidebar'
 import { DashboardTopBar } from '@/components/DashboardTopBar'
+import { MobileBottomNav } from '@/components/MobileBottomNav'
 
 function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
   const { data: session } = useSession()
@@ -32,16 +33,18 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex h-screen bg-slate-50 dark:bg-slate-950 overflow-hidden">
-      <DashboardSidebar
-        isMobileOpen={isMobileSidebarOpen}
-        onMobileOpenChange={setIsMobileSidebarOpen}
-      />
+      {/* Sidebar - Hidden on mobile, visible on desktop */}
+      <div className="hidden lg:block">
+        <DashboardSidebar />
+      </div>
       <div className="flex flex-1 flex-col min-w-0">
-        {!isMobileSidebarOpen && <DashboardTopBar onMobileMenuClick={toggleSidebar} />}
-        <main className="flex-1 overflow-y-auto p-6 lg:p-8 pt-16 lg:pt-6">
+        <DashboardTopBar onMobileMenuClick={toggleSidebar} />
+        <main className="flex-1 overflow-y-auto p-6 lg:p-8 pt-16 lg:pt-6 pb-20 lg:pb-8">
           {children}
         </main>
       </div>
+      {/* Mobile Bottom Nav - Visible only on mobile */}
+      <MobileBottomNav />
     </div>
   )
 }

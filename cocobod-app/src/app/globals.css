@@ -464,3 +464,12 @@ body:has([role="dialog"][data-state="open"]) header[data-topbar="true"] {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;  /* Chrome, Safari and Opera */
 }
+
+/* Safe area padding for mobile devices (notch, home indicator) */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.safe-area-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}

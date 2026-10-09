@@ -292,18 +292,109 @@ export default function GuardsClient({ guards: initialGuards, userRole }: Guards
         />
       </div>
 
-      {/* Guards Table */}
-      <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
+      {/* Mobile Card View */}
+      <div className="lg:hidden space-y-3">
+        {filteredGuards.length === 0 ? (
+          <div className="text-center py-16">
+            <div className="inline-flex p-4 rounded-full bg-slate-100 dark:bg-slate-800 mb-3">
+              <Users className="h-7 w-7 text-slate-400" />
+            </div>
+            <p className="font-semibold text-slate-700 dark:text-slate-300">No guards found</p>
+            <p className="text-xs text-slate-500 mt-1">
+              {searchQuery ? 'Try a different search term.' : 'No active guards are registered.'}
+            </p>
+          </div>
+        ) : (
+          paginatedGuards.map(guard => {
+            const activeIssue = guard.issues.find(i => i.status === 'ISSUED')
+            const recentReturn = guard.issues.find(i => i.status === 'FULLY_RETURNED' || i.status === 'PARTIALLY_RETURNED')
+            const displayIssue = activeIssue || recentReturn
+
+            return (
+              <Card
+                key={guard.id}
+                onClick={() => openGuardDetail(guard)}
+                className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
+              >
+                <CardContent className="p-4">
+                  <div className="flex items-start gap-3">
+                    {guard.photoUrl ? (
+                      <img
+                        src={guard.photoUrl}
+                        alt={guard.fullName}
+                        className="h-12 w-12 rounded-full object-cover border-2 border-slate-200 dark:border-slate-700 shrink-0"
+                      />
+                    ) : (
+                      <div className="h-12 w-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center border-2 border-slate-200 dark:border-slate-700 shrink-0">
+                        <Shield className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="font-semibold text-slate-900 dark:text-white truncate">{guard.fullName}</p>
+                          <p className="text-xs text-slate-500">{guard.badgeId}</p>
+                        </div>
+                        {activeIssue ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300 border border-amber-200 dark:border-amber-800 shrink-0">
+                            <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse inline-block" />
+                            Active
+                          </span>
+                        ) : displayIssue ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 shrink-0">
+                            <CheckCircle className="h-3 w-3" />
+                            Returned
+                          </span>
+                        ) : (
+                          <span className="text-slate-400 text-xs shrink-0">—</span>
+                        )}
+                      </div>
+                      <div className="mt-2 space-y-1">
+                        <div className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
+                          <CalendarClock className="h-3.5 w-3.5 shrink-0" />
+                          <span>{guard.shift || displayIssue?.shift || 'No shift'}</span>
+                        </div>
+                        {displayIssue?.dutyPoint && (
+                          <div className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
+                            <MapPin className="h-3.5 w-3.5 shrink-0" />
+                            <span className="truncate">{displayIssue.dutyPoint}</span>
+                          </div>
+                        )}
+                        {activeIssue && activeIssue.items.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-2">
+                            {activeIssue.items.slice(0, 2).map((item, idx) => (
+                              <span key={idx} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 border border-blue-100 dark:border-blue-800">
+                                <Package className="h-3 w-3" />
+                                {item.equipment.itemName} ×{item.quantityOutstanding}
+                              </span>
+                            ))}
+                            {activeIssue.items.length > 2 && (
+                              <span className="text-xs text-slate-500">+{activeIssue.items.length - 2} more</span>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )
+          })
+        )}
+      </div>
+
+      {/* Desktop Table View */}
+      <Card className="hidden lg:block border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider">
               <tr>
                 <th className="px-5 py-3.5 font-semibold">Guard</th>
-                <th className="px-5 py-3.5 font-semibold hidden sm:table-cell">Shift</th>
-                <th className="px-5 py-3.5 font-semibold hidden md:table-cell">Duty Point</th>
-                <th className="px-5 py-3.5 font-semibold hidden lg:table-cell">Items in Possession</th>
-                <th className="px-5 py-3.5 font-semibold hidden md:table-cell">Issued At</th>
-                <th className="px-5 py-3.5 font-semibold hidden sm:table-cell">Status</th>
+                <th className="px-5 py-3.5 font-semibold">Shift</th>
+                <th className="px-5 py-3.5 font-semibold">Duty Point</th>
+                <th className="px-5 py-3.5 font-semibold">Items in Possession</th>
+                <th className="px-5 py-3.5 font-semibold">Issued At</th>
+                <th className="px-5 py-3.5 font-semibold">Status</th>
                 <th className="px-5 py-3.5 text-right font-semibold">Actions</th>
               </tr>
             </thead>
@@ -351,7 +442,7 @@ export default function GuardsClient({ guards: initialGuards, userRole }: Guards
                           </div>
                         </div>
                       </td>
-                      <td className="px-5 py-3.5 hidden sm:table-cell">
+                      <td className="px-5 py-3.5">
                         {(guard.shift || displayIssue?.shift) ? (
                           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">
                             <CalendarClock className="h-3 w-3" />
@@ -359,7 +450,7 @@ export default function GuardsClient({ guards: initialGuards, userRole }: Guards
                           </span>
                         ) : <span className="text-slate-400 text-xs">—</span>}
                       </td>
-                      <td className="px-5 py-3.5 hidden md:table-cell">
+                      <td className="px-5 py-3.5">
                         {displayIssue?.dutyPoint ? (
                           <span className="flex items-center gap-1.5 text-sm text-slate-700 dark:text-slate-300">
                             <MapPin className="h-3.5 w-3.5 text-slate-400 shrink-0" />
@@ -367,7 +458,7 @@ export default function GuardsClient({ guards: initialGuards, userRole }: Guards
                           </span>
                         ) : <span className="text-slate-400 text-xs">—</span>}
                       </td>
-                      <td className="px-5 py-3.5 hidden lg:table-cell">
+                      <td className="px-5 py-3.5">
                         {activeIssue ? (
                           <div className="flex flex-wrap gap-1">
                             {activeIssue.items.map((item, idx) => (
@@ -379,7 +470,7 @@ export default function GuardsClient({ guards: initialGuards, userRole }: Guards
                           </div>
                         ) : <span className="text-slate-400 text-xs italic">None</span>}
                       </td>
-                      <td className="px-5 py-3.5 hidden md:table-cell">
+                      <td className="px-5 py-3.5">
                         {displayIssue?.issuedAt ? (
                           <div className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-400">
                             <Clock className="h-3.5 w-3.5" />
@@ -390,7 +481,7 @@ export default function GuardsClient({ guards: initialGuards, userRole }: Guards
                           </div>
                         ) : <span className="text-slate-400 text-xs">—</span>}
                       </td>
-                      <td className="px-5 py-3.5 hidden sm:table-cell">
+                      <td className="px-5 py-3.5">
                         {activeIssue ? (
                           <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
                             <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse inline-block" />
@@ -437,10 +528,12 @@ export default function GuardsClient({ guards: initialGuards, userRole }: Guards
             </tbody>
           </table>
         </div>
+      </Card>
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between px-5 py-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+      {/* Pagination - Shared for both mobile and desktop */}
+      {totalPages > 1 && (
+        <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+          <div className="flex items-center justify-between px-5 py-4">
             <p className="text-xs text-slate-600 dark:text-slate-400">
               Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, filteredGuards.length)} of {filteredGuards.length} guards
             </p>
@@ -490,8 +583,8 @@ export default function GuardsClient({ guards: initialGuards, userRole }: Guards
               </Button>
             </div>
           </div>
-        )}
-      </Card>
+        </Card>
+      )}
 
       {/* ─── Add Guard Dialog ─── */}
       {isSupervisor && (
