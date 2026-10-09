@@ -60,6 +60,7 @@ function IssueEquipmentContent() {
     fetch('/api/users/me')
       .then(res => res.json())
       .then(data => {
+        console.log('User role fetched:', data.role)
         if (data.role) {
           setUserRole(data.role)
         }
@@ -226,7 +227,7 @@ function IssueEquipmentContent() {
             </h1>
             <p className="text-sm text-slate-300 mt-1">View and manage equipment issued to staff</p>
           </div>
-          {userRole === 'EQUIPMENT_CUSTODIAN' ? (
+          {userRole === 'EQUIPMENT_CUSTODIAN' || userRole === 'SECURITY_SUPERVISOR' ? (
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
                 <Button className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium shadow-sm">
@@ -350,11 +351,11 @@ function IssueEquipmentContent() {
                 </form>
               </DialogContent>
             </Dialog>
-          ) : userRole === 'SECURITY_SUPERVISOR' ? (
+          ) : userRole ? (
             <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800">
               <Lock className="h-4 w-4 text-amber-600 dark:text-amber-400" />
               <span className="text-sm text-amber-800 dark:text-amber-300 font-medium">
-                Read-only view - Only Custodians can issue equipment
+                Read-only view - Only Custodians and Supervisors can issue equipment
               </span>
             </div>
           ) : null}
