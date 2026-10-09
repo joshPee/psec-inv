@@ -52,7 +52,7 @@ export default function LoginPage() {
         <div className="flex justify-center -mb-8 relative z-10">
           <div className="w-16 h-16 rounded-full bg-white dark:bg-slate-900 flex items-center justify-center shadow-[0_4px_20px_rgba(0,0,0,0.1)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.3)] border border-slate-200 dark:border-slate-800 p-2"
                style={{ animation: 'pulseGlow 3s ease-in-out infinite' }}>
-            <img src="/pcc.png" alt="PCC Logo" className="w-11 h-11 object-contain" />
+            <img src="/pcc.png" alt="PCC Logo" className="w-11 h-11 object-contain dark:brightness-0 dark:invert" />
           </div>
         </div>
 

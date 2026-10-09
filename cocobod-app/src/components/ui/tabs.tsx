@@ -40,7 +40,7 @@ const Tabs: React.FC<TabsProps> = ({ value, onValueChange, children, className =
 
 const TabsList: React.FC<TabsListProps> = ({ children, className = '' }) => {
   return (
-    <div className={`inline-flex h-10 items-center justify-center rounded-md bg-gray-100 p-1 ${className}`}>
+    <div className={`inline-flex h-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 p-1 text-slate-500 dark:text-slate-400 ${className}`}>
       {children}
     </div>
   );
@@ -53,10 +53,10 @@ const TabsTrigger: React.FC<TabsTriggerProps> = ({ value, children }) => {
   return (
     <button
       onClick={() => onValueChange(value)}
-      className={`inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 disabled:pointer-events-none disabled:opacity-50 ${
+      className={`inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 disabled:pointer-events-none disabled:opacity-50 ${
         isActive
-          ? 'bg-white text-gray-900 shadow-sm'
-          : 'text-gray-500 hover:text-gray-900'
+          ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm'
+          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/50 dark:hover:bg-slate-700/50'
       }`}
     >
       {children}

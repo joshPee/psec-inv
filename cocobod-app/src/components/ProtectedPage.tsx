@@ -59,20 +59,22 @@ export default function ProtectedPage({ children, requiredRole, resourcePath }: 
 
   if (!hasAccess) {
     return (
-      <Card className="max-w-md mx-auto mt-8">
+      <Card className="max-w-md mx-auto mt-8 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
         <CardContent className="pt-6">
           <div className="flex flex-col items-center text-center">
-            <Lock className="h-12 w-12 text-gray-400 mb-4" />
-            <h2 className="text-lg font-semibold text-gray-900 mb-2">Access Denied</h2>
-            <p className="text-sm text-gray-500 mb-4">
-              You don't have permission to access this page.
+            <div className="h-14 w-14 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-4 text-slate-400 dark:text-slate-500">
+              <Lock className="h-7 w-7" />
+            </div>
+            <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">Access Denied</h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
+              You don&apos;t have permission to access this page.
             </p>
-            <div className="flex items-start gap-2 text-xs text-gray-500 bg-gray-50 p-3 rounded-lg">
-              <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
-              <p>
-                Required role: {requiredRole || 'Higher privilege level'}<br />
-                Your role: {userRole}
-              </p>
+            <div className="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 p-3 rounded-lg w-full text-left">
+              <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 text-amber-500" />
+              <div>
+                <p><span className="font-medium text-slate-700 dark:text-slate-300">Required role:</span> {requiredRole || 'Higher privilege level'}</p>
+                <p className="mt-0.5"><span className="font-medium text-slate-700 dark:text-slate-300">Your role:</span> {userRole}</p>
+              </div>
             </div>
           </div>
         </CardContent>

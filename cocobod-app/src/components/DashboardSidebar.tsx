@@ -156,7 +156,7 @@ export function DashboardSidebar({ onMobileOpenChange, isMobileOpen: externalIsM
       <div className="flex items-center justify-between p-4 border-b border-slate-200/60 dark:border-slate-800/60">
         <div className="flex items-center gap-3">
           <div className="flex items-center justify-center w-10 h-10 flex-shrink-0">
-            <img src="/pcc.png" alt="PCC Logo" className="w-10 h-10 object-contain border border-slate-200 dark:border-slate-700 rounded-lg" />
+            <img src="/pcc.png" alt="PCC Logo" className="w-10 h-10 object-contain border border-slate-200 dark:border-slate-700 rounded-lg dark:brightness-0 dark:invert" />
           </div>
           {(!isCollapsed || isMobile) && (
             <div className="overflow-hidden">

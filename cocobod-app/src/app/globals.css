@@ -487,10 +487,7 @@
 }
 
 /* Automatically hide topbar when any modal form/dialog is open */
-body:has([role="dialog"]) #dashboard-topbar,
 body:has([role="dialog"][data-state="open"]) #dashboard-topbar,
-body:has([data-radix-portal] [data-state="open"]) #dashboard-topbar,
-body:has([role="dialog"]) header[data-topbar="true"],
 body:has([role="dialog"][data-state="open"]) header[data-topbar="true"] {
   display: none !important;
 }
@@ -514,23 +511,18 @@ body:has([role="dialog"][data-state="open"]) header[data-topbar="true"] {
   padding-top: env(safe-area-inset-top, 0px);
 }
 
-/* Touch targets for mobile (44px minimum per Apple guidelines) */
+/* Touch targets for mobile (Apple Human Interface Guidelines) */
 .touch-target {
   min-height: 44px;
   min-width: 44px;
 }
 
-/* Ensure buttons, links, and inputs meet touch target size */
-button, a, input, select, textarea {
-  min-height: 44px;
-  min-width: 44px;
-}
-
-/* For smaller elements, use padding to meet minimum */
-button-sm, a-sm {
-  min-height: 44px;
-  min-width: 44px;
-  padding: 0.5rem 1rem;
+@media (pointer: coarse) {
+  .touch-target-coarse,
+  button:not(.no-touch-target):not([class*="h-"]):not([class*="size-"]),
+  input:not([type="checkbox"]):not([type="radio"]):not([class*="h-"]) {
+    min-height: 40px;
+  }
 }
 
 /* Mobile keyboard handling - prevent keyboard from covering inputs */

@@ -85,7 +85,7 @@ export function DashboardTopBar() {
         <div className="flex items-center gap-2 md:gap-4">
           <div className="flex items-center gap-2 md:gap-3">
             <div className="lg:hidden shrink-0">
-              <img src="/pcc.png" alt="PCC Logo" className="w-8 h-8 object-contain border border-slate-200 dark:border-slate-700 rounded-lg" />
+              <img src="/pcc.png" alt="PCC Logo" className="w-8 h-8 object-contain border border-slate-200 dark:border-slate-700 rounded-lg dark:brightness-0 dark:invert" />
             </div>
             <h2 className="text-sm md:text-base font-semibold text-slate-800 dark:text-slate-100">{getTimeBasedGreeting()}</h2>
           </div>

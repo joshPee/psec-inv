@@ -260,7 +260,7 @@ export function NotificationsDropdown() {
                   )}
                   <button
                     onClick={(e) => deleteNotification(notification.id, e)}
-                    className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 transition-all"
+                    className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 transition-all"
                   >
                     <X className="h-3.5 w-3.5 text-slate-400 hover:text-rose-500" />
                   </button>
