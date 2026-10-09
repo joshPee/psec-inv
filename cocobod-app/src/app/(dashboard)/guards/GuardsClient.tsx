@@ -327,7 +327,11 @@ export default function GuardsClient({ guards: initialGuards, userRole }: Guards
                   const displayIssue = activeIssue || recentReturn
 
                   return (
-                    <tr key={guard.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group">
+                    <tr
+                      key={guard.id}
+                      onClick={() => openGuardDetail(guard)}
+                      className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group cursor-pointer"
+                    >
                       <td className="px-5 py-3.5">
                         <div className="flex items-center gap-3">
                           {guard.photoUrl ? (
@@ -406,7 +410,10 @@ export default function GuardsClient({ guards: initialGuards, userRole }: Guards
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => openGuardDetail(guard)}
+                            onClick={e => {
+                              e.stopPropagation()
+                              openGuardDetail(guard)
+                            }}
                             className="h-8 text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/30"
                           >
                             View
