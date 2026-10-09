@@ -308,39 +308,47 @@ export default function GuardProfileClient({ guard, userRole }: GuardProfileClie
 
       {/* Tabs */}
       <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
-        <CardHeader>
-          <div className="flex gap-2">
+        <CardHeader className="pb-3">
+          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-2 px-2 md:mx-0 md:px-0 md:pb-0">
             <Button
               variant={activeTab === 'holdings' ? 'default' : 'outline'}
               onClick={() => setActiveTab('holdings')}
-              className="dark:border-slate-700"
+              className="dark:border-slate-700 shrink-0 whitespace-nowrap"
+              size="sm"
             >
-              <Package className="h-4 w-4 mr-2" />
-              Current Holdings
+              <Package className="h-4 w-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">Current Holdings</span>
+              <span className="sm:hidden">Holdings</span>
             </Button>
             <Button
               variant={activeTab === 'bookings' ? 'default' : 'outline'}
               onClick={() => setActiveTab('bookings')}
-              className="dark:border-slate-700"
+              className="dark:border-slate-700 shrink-0 whitespace-nowrap"
+              size="sm"
             >
-              <Calendar className="h-4 w-4 mr-2" />
-              Bookings
+              <Calendar className="h-4 w-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">Bookings</span>
+              <span className="sm:hidden">Bookings</span>
             </Button>
             <Button
               variant={activeTab === 'damaged' ? 'default' : 'outline'}
               onClick={() => setActiveTab('damaged')}
-              className="dark:border-slate-700"
+              className="dark:border-slate-700 shrink-0 whitespace-nowrap"
+              size="sm"
             >
-              <AlertTriangle className="h-4 w-4 mr-2" />
-              Damaged Records
+              <AlertTriangle className="h-4 w-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">Damaged</span>
+              <span className="sm:hidden">Damaged</span>
             </Button>
             <Button
               variant={activeTab === 'missing' ? 'default' : 'outline'}
               onClick={() => setActiveTab('missing')}
-              className="dark:border-slate-700"
+              className="dark:border-slate-700 shrink-0 whitespace-nowrap"
+              size="sm"
             >
-              <Search className="h-4 w-4 mr-2" />
-              Missing Records
+              <Search className="h-4 w-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">Missing</span>
+              <span className="sm:hidden">Missing</span>
             </Button>
           </div>
         </CardHeader>

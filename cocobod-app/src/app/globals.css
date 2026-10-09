@@ -454,3 +454,13 @@ body:has([role="dialog"]) header[data-topbar="true"],
 body:has([role="dialog"][data-state="open"]) header[data-topbar="true"] {
   display: none !important;
 }
+
+/* Hide scrollbar but keep functionality for horizontal scrolling */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
+}
