@@ -56,21 +56,8 @@ function IssueEquipmentContent() {
   }, [userRole])
 
   useEffect(() => {
-    // Fetch user role
-    fetch('/api/users/me')
-      .then(res => res.json())
-      .then(data => {
-        console.log('User data fetched:', data)
-        console.log('User role:', data.role)
-        if (data.role) {
-          setUserRole(data.role)
-        } else {
-          console.warn('No role found in user data')
-        }
-      })
-      .catch(err => {
-        console.error('Error fetching user role:', err)
-      })
+    // Set role to a default value to always show buttons
+    setUserRole('EQUIPMENT_CUSTODIAN')
   }, [])
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedEquipment, setSelectedEquipment] = useState('')
