@@ -125,10 +125,14 @@ export function MobileBottomNav() {
         </div>
       </div>
 
-      {/* More Modal */}
+      {/* More Modal - Bottom Sheet */}
       <Dialog open={isMoreOpen} onOpenChange={setIsMoreOpen}>
-        <DialogContent className="sm:max-w-md bg-white dark:bg-slate-900 rounded-t-2xl fixed bottom-0 left-0 right-0 top-auto rounded-b-none max-h-[70vh] overflow-y-auto">
-          <DialogHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+        <DialogContent 
+          className="fixed left-0 right-0 bottom-0 top-auto translate-x-0 translate-y-0 rounded-t-2xl rounded-b-none max-h-[75vh] overflow-y-auto bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 m-0 w-full max-w-none"
+          onPointerDownOutside={(e) => e.preventDefault()}
+          onInteractOutside={(e) => e.preventDefault()}
+        >
+          <DialogHeader className="flex flex-row items-center justify-between space-y-0 pb-4 px-4 pt-4">
             <DialogTitle className="text-lg font-semibold">More Options</DialogTitle>
             <button
               onClick={() => setIsMoreOpen(false)}
@@ -138,7 +142,7 @@ export function MobileBottomNav() {
               <span className="sr-only">Close</span>
             </button>
           </DialogHeader>
-          <div className="space-y-1">
+          <div className="space-y-1 px-4 pb-4">
             {moreItems.map((item) => {
               const isActive = pathname === item.href
               return (
