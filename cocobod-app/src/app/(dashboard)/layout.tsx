@@ -11,12 +11,7 @@ import { MobileBottomNav } from '@/components/MobileBottomNav'
 function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
   const { data: session } = useSession()
   const router = useRouter()
-  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
   const isSupervisor = session?.user?.role === 'SECURITY_SUPERVISOR'
-
-  const toggleSidebar = () => {
-    setIsMobileSidebarOpen(prev => !prev)
-  }
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -38,7 +33,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
         <DashboardSidebar />
       </div>
       <div className="flex flex-1 flex-col min-w-0">
-        <DashboardTopBar onMobileMenuClick={toggleSidebar} />
+        <DashboardTopBar />
         <main className="flex-1 overflow-y-auto p-6 lg:p-8 pt-16 lg:pt-6 pb-20 lg:pb-8">
           {children}
         </main>

@@ -15,7 +15,8 @@ import {
   AlertTriangle,
   UserCog,
   Plus,
-  X
+  X,
+  MoreHorizontal
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useState } from 'react'
@@ -114,7 +115,18 @@ export function MobileBottomNav() {
               </Link>
             )
           })}
-
+          <button
+            onClick={() => setIsMoreOpen(true)}
+            className={cn(
+              'flex flex-col items-center justify-center w-full h-full min-w-0 px-1',
+              'transition-colors duration-200'
+            )}
+          >
+            <MoreHorizontal className="h-5 w-5 mb-1 text-slate-500 dark:text-slate-400" />
+            <span className="text-[10px] font-medium leading-tight text-slate-500 dark:text-slate-400">
+              More
+            </span>
+          </button>
         </div>
       </div>
 

@@ -24,7 +24,7 @@ import { NotificationsDropdown } from '@/components/NotificationsDropdown'
 import { cn } from '@/lib/utils'
 import { ThemeToggle } from '@/components/ThemeToggle'
 
-export function DashboardTopBar({ onMobileMenuClick }: { onMobileMenuClick?: () => void }) {
+export function DashboardTopBar() {
   const { data: session } = useSession()
   const [showSignOutDialog, setShowSignOutDialog] = useState(false)
   const [isFormOpen, setIsFormOpen] = useState(false)
@@ -83,14 +83,6 @@ export function DashboardTopBar({ onMobileMenuClick }: { onMobileMenuClick?: () 
         )}
       >
         <div className="flex items-center gap-2 md:gap-4">
-          {/* Mobile Menu Button - Left Side */}
-          <button
-            className="lg:hidden p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-all duration-200 active:scale-95"
-            onClick={onMobileMenuClick}
-            aria-label="Open menu"
-          >
-            <Menu className="h-5 w-5" />
-          </button>
           <div className="flex items-center gap-2 md:gap-3">
             <div className="lg:hidden shrink-0">
               <img src="/pcc.png" alt="PCC Logo" className="w-8 h-8 object-contain border border-slate-200 dark:border-slate-700 rounded-lg" />
