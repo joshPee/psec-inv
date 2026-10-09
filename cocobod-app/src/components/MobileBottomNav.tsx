@@ -9,12 +9,13 @@ import {
   Shield,
   Search,
   FileText,
-  MoreHorizontal,
   PackageCheck,
   TrendingUp,
   History,
   AlertTriangle,
   UserCog,
+  Plus,
+  Scan,
   X
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -24,6 +25,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogClose,
 } from '@/components/ui/dialog'
 
 interface NavItem {
@@ -74,8 +76,11 @@ export function MobileBottomNav() {
   const pathname = usePathname()
   const { data: session } = useSession()
   const [isMoreOpen, setIsMoreOpen] = useState(false)
+  const [isFabOpen, setIsFabOpen] = useState(false)
   const bottomNavItems = getBottomNavItems(session?.user?.role)
   const moreItems = getMoreItems(session?.user?.role)
+  const isCustodian = session?.user?.role === 'EQUIPMENT_CUSTODIAN'
+  const isSupervisor = session?.user?.role === 'SECURITY_SUPERVISOR'
 
   return (
     <>
@@ -110,17 +115,73 @@ export function MobileBottomNav() {
               </Link>
             )
           })}
+
+        </div>
+      </div>
+
+      {/* Floating Action Button for Quick Actions */}
+      <div className="fixed bottom-20 right-4 z-40 lg:hidden">
+        <div className="relative">
+          {isFabOpen && (
+            <div className="absolute bottom-16 right-0 flex flex-col gap-2 items-end">
+              {isCustodian && (
+                <>
+                  <Link
+                    href="/issue"
+                    onClick={() => setIsFabOpen(false)}
+                    className="flex items-center gap-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 px-3 py-2 rounded-lg shadow-lg text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                  >
+                    <span>Issue Item</span>
+                    <TrendingUp className="h-4 w-4" />
+                  </Link>
+                  <Link
+                    href="/return"
+                    onClick={() => setIsFabOpen(false)}
+                    className="flex items-center gap-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 px-3 py-2 rounded-lg shadow-lg text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                  >
+                    <span>Return Item</span>
+                    <History className="h-4 w-4" />
+                  </Link>
+                </>
+              )}
+              {isSupervisor && (
+                <Link
+                  href="/add"
+                  onClick={() => setIsFabOpen(false)}
+                  className="flex items-center gap-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 px-3 py-2 rounded-lg shadow-lg text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                >
+                  <span>Add Equipment</span>
+                  <Plus className="h-4 w-4" />
+                </Link>
+              )}
+              <Link
+                href="/inventory"
+                onClick={() => setIsFabOpen(false)}
+                className="flex items-center gap-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 px-3 py-2 rounded-lg shadow-lg text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+              >
+                <span>Scan QR</span>
+                <Scan className="h-4 w-4" />
+              </Link>
+            </div>
+          )}
           <button
-            onClick={() => setIsMoreOpen(true)}
+            onClick={() => setIsFabOpen(!isFabOpen)}
             className={cn(
-              'flex flex-col items-center justify-center w-full h-full min-w-0 px-1',
-              'transition-colors duration-200'
+              'w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all duration-300',
+              isFabOpen ? 'bg-slate-500 hover:bg-slate-600' : 'bg-emerald-600 hover:bg-emerald-700'
             )}
           >
-            <MoreHorizontal className="h-5 w-5 mb-1 text-slate-500 dark:text-slate-400" />
-            <span className="text-[10px] font-medium leading-tight text-slate-500 dark:text-slate-400">
-              More
-            </span>
+            {isFabOpen ? (
+              <X className="h-6 w-6 text-white" />
+            ) : (
+              <Plus className="h-6 w-6 text-white" />
+            )}
+          </button>
+          <button
+            onClick={() => setIsMoreOpen(true)}
+            className="absolute -top-12 right-0 bg-slate-600 hover:bg-slate-700 text-white px-3 py-1 rounded-full text-xs font-medium shadow-lg"
+          >
+            More
           </button>
         </div>
       </div>
@@ -129,18 +190,13 @@ export function MobileBottomNav() {
       <Dialog open={isMoreOpen} onOpenChange={setIsMoreOpen}>
         <DialogContent 
           className="fixed left-0 right-0 bottom-0 top-auto translate-x-0 translate-y-0 rounded-t-2xl rounded-b-none max-h-[75vh] overflow-y-auto bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 m-0 w-full max-w-none"
-          onPointerDownOutside={(e) => e.preventDefault()}
-          onInteractOutside={(e) => e.preventDefault()}
         >
           <DialogHeader className="flex flex-row items-center justify-between space-y-0 pb-4 px-4 pt-4">
             <DialogTitle className="text-lg font-semibold">More Options</DialogTitle>
-            <button
-              onClick={() => setIsMoreOpen(false)}
-              className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
-            >
+            <DialogClose className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
               <X className="h-5 w-5" />
               <span className="sr-only">Close</span>
-            </button>
+            </DialogClose>
           </DialogHeader>
           <div className="space-y-1 px-4 pb-4">
             {moreItems.map((item) => {
