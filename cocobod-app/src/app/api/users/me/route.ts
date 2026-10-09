@@ -18,7 +18,7 @@ export async function GET() {
       where: { id: session.user.id },
       select: {
         id: true,
-        name: true,
+        fullName: true,
         email: true,
         role: true,
       }
@@ -31,7 +31,10 @@ export async function GET() {
       );
     }
 
-    return NextResponse.json(user);
+    return NextResponse.json({
+      ...user,
+      name: user.fullName,
+    });
   } catch (error) {
     console.error('Error fetching current user:', error);
     return NextResponse.json(
