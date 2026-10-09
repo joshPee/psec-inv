@@ -15,7 +15,6 @@ import {
   AlertTriangle,
   UserCog,
   Plus,
-  Scan,
   X
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -127,7 +126,7 @@ export function MobileBottomNav() {
               {isCustodian && (
                 <>
                   <Link
-                    href="/issue"
+                    href="/issue?openDialog=true"
                     onClick={() => setIsFabOpen(false)}
                     className="flex items-center gap-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 px-3 py-2 rounded-lg shadow-lg text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
                   >
@@ -135,7 +134,7 @@ export function MobileBottomNav() {
                     <TrendingUp className="h-4 w-4" />
                   </Link>
                   <Link
-                    href="/return"
+                    href="/return?openDialog=true"
                     onClick={() => setIsFabOpen(false)}
                     className="flex items-center gap-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 px-3 py-2 rounded-lg shadow-lg text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
                   >
@@ -154,14 +153,6 @@ export function MobileBottomNav() {
                   <Plus className="h-4 w-4" />
                 </Link>
               )}
-              <Link
-                href="/inventory"
-                onClick={() => setIsFabOpen(false)}
-                className="flex items-center gap-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 px-3 py-2 rounded-lg shadow-lg text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-              >
-                <span>Scan QR</span>
-                <Scan className="h-4 w-4" />
-              </Link>
             </div>
           )}
           <button
@@ -176,12 +167,6 @@ export function MobileBottomNav() {
             ) : (
               <Plus className="h-6 w-6 text-white" />
             )}
-          </button>
-          <button
-            onClick={() => setIsMoreOpen(true)}
-            className="absolute -top-12 right-0 bg-slate-600 hover:bg-slate-700 text-white px-3 py-1 rounded-full text-xs font-medium shadow-lg"
-          >
-            More
           </button>
         </div>
       </div>
