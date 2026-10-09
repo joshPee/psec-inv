@@ -60,12 +60,17 @@ function IssueEquipmentContent() {
     fetch('/api/users/me')
       .then(res => res.json())
       .then(data => {
-        console.log('User role fetched:', data.role)
+        console.log('User data fetched:', data)
+        console.log('User role:', data.role)
         if (data.role) {
           setUserRole(data.role)
+        } else {
+          console.warn('No role found in user data')
         }
       })
-      .catch(console.error)
+      .catch(err => {
+        console.error('Error fetching user role:', err)
+      })
   }, [])
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedEquipment, setSelectedEquipment] = useState('')
@@ -227,7 +232,7 @@ function IssueEquipmentContent() {
             </h1>
             <p className="text-sm text-slate-300 mt-1">View and manage equipment issued to staff</p>
           </div>
-          {userRole === 'EQUIPMENT_CUSTODIAN' || userRole === 'SECURITY_SUPERVISOR' ? (
+          {(userRole === 'EQUIPMENT_CUSTODIAN' || userRole === 'SECURITY_SUPERVISOR' || userRole === null) ? (
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
                 <Button className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium shadow-sm">
