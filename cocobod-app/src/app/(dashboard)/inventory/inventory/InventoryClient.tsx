@@ -633,7 +633,7 @@ export default function InventoryClient({ equipment, categories, initialSearch, 
                         <td className="py-3 px-4 text-slate-900 dark:text-white font-semibold">{item.totalQuantity}</td>
                         <td className={`py-3 px-4 font-semibold ${isLowStock ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
                           {item.availableQuantity}
-                          {item.lowStockThreshold && (
+                          {item.lowStockThreshold > 0 && (
                             <span className="text-xs text-slate-400 dark:text-slate-500 ml-1">
                               (min: {item.lowStockThreshold})
                             </span>
