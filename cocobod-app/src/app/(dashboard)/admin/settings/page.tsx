@@ -10,6 +10,7 @@ import { LogOut, User, FolderPlus, FolderEdit, Trash2, Power, PowerOff, Settings
 import { useToast } from '@/components/ui/toast'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { NotificationSettings } from '@/components/NotificationSettings'
 
 export default function SettingsPage() {
   const { data: session } = useSession()
@@ -366,6 +367,8 @@ export default function SettingsPage() {
           )}
         </CardContent>
       </Card>
+
+      <NotificationSettings />
 
       <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
         <CardHeader>

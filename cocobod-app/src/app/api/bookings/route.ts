@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { notifyBookingRequest } from '@/lib/notifications';
+import { sendBookingAlert } from '@/lib/send-push-notification';
 
 export async function GET(request: NextRequest) {
   try {
@@ -151,6 +152,9 @@ export async function POST(request: NextRequest) {
 
     // Notify supervisors about new booking
     notifyBookingRequest(guard.fullName, equipment.itemName, quantityRequested).catch(console.error);
+    
+    // Send push notification for new booking
+    sendBookingAlert(guard.fullName, equipment.itemName).catch(console.error);
 
     return NextResponse.json({ success: true, booking });
   } catch (error) {
