@@ -130,6 +130,7 @@ async function getDashboardStats() {
       todayIssuedCount,
       todayReturnedCount,
       categoriesWithStock,
+      pendingBookingsCount,
     ] = await Promise.all([
       // Aggregation of all 5 inventory pillars
       prisma.equipment.aggregate({
@@ -216,6 +217,11 @@ async function getDashboardStats() {
         },
         orderBy: { name: 'asc' },
       }),
+
+      // Pending bookings count
+      prisma.equipmentBooking.count({
+        where: { status: 'PENDING' },
+      }),
     ])
 
     const total = inventoryAggregate._sum.totalQuantity || 0
@@ -299,6 +305,7 @@ async function getDashboardStats() {
         damaged,
         missing,
         isBalanced: total === (available + reserved + issued + damaged + missing),
+        pendingBookings: pendingBookingsCount,
       },
       kpis: {
         totalItems: total,
@@ -342,6 +349,7 @@ async function getDashboardStats() {
         damaged: 0,
         missing: 0,
         isBalanced: true,
+        pendingBookings: 0,
       },
       kpis: {
         totalItems: 0,

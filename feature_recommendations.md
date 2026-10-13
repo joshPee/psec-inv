@@ -7,13 +7,41 @@ A **Security Equipment Management System** (SECMS) for managing security equipme
 
 ## Implementation Status
 
-**✅ Completed (30):** Guard Profile Page, Live Notifications, Low-Stock Alerts, QR Codes, Expected Return Date, Overdue Issues Tracker, Shift Handover Report, Inventory Restock Workflow, Condition Timeline, Bulk CSV Import, Advanced Analytics Charts, Guard Portal Enhancements, Guard Photos, Keyboard Shortcuts, Live Dashboard Updates, Mobile Card View for Tables, Pull-to-Refresh, Mobile Action Sheets, Swipe Actions, Enhanced Mobile Search, Bottom Nav Improvements (badges, haptic feedback), Mobile-Optimized Forms, Mobile Dashboard Sections, Mobile Navigation (breadcrumbs, back button), Virtual Scrolling, Mobile Animations, Mobile Theme Toggle, Mobile Keyboard Handling, Touch Targets (44px minimum), Offline Indicator
+**✅ Completed (32):** Guard Profile Page, Live Notifications, Low-Stock Alerts, QR Codes, Expected Return Date, Overdue Issues Tracker, Shift Handover Report, Inventory Restock Workflow, Condition Timeline, Bulk CSV Import, Advanced Analytics Charts, Guard Portal Enhancements, Guard Photos, Keyboard Shortcuts, Live Dashboard Updates, Mobile Card View for Tables, Pull-to-Refresh, Mobile Action Sheets, Swipe Actions, Enhanced Mobile Search, Bottom Nav Improvements (badges, haptic feedback), Mobile-Optimized Forms, Mobile Dashboard Sections, Mobile Navigation (breadcrumbs, back button), Virtual Scrolling, Mobile Animations, Mobile Theme Toggle, Mobile Keyboard Handling, Touch Targets (44px minimum), Offline Indicator, Mobile-Optimized Dashboard, Push Notifications Infrastructure
 **🟡 Partial (0):** None
 **❌ Not Started (0):** None
 
 ---
 
 ## 🔥 High-Impact, High-Priority
+
+### 16. Mobile-Optimized Dashboard
+**Status:** ✅ **COMPLETED** - Created mobile-specific dashboard with quick stats, alert cards, quick actions, and responsive design.
+**Why it matters:** Mobile users need a streamlined dashboard optimized for touch and small screens.
+**What was built:**
+- Mobile-specific dashboard component with hidden lg:hidden responsive class
+- Quick stats overview (total and available items)
+- Alert cards for overdue items, pending bookings, and low stock
+- Quick action buttons (Add Equipment, Issue, Active, Guards)
+- Quick links to Reports, Movement Log, and Categories
+- One-tap actions for common tasks
+- Gesture-based navigation support
+
+### 17. Push Notifications Infrastructure
+**Status:** ✅ **COMPLETED** - Full infrastructure with VAPID keys, service worker, subscription API, and notification triggers.
+**Why it matters:** Users need real-time alerts for overdue equipment, booking requests, and low stock without keeping the app open.
+**What was built:**
+- Service worker for offline support and push notifications
+- VAPID key configuration for web push
+- Push subscription API endpoints (subscribe/unsubscribe)
+- PushSubscription model in Prisma schema
+- NotificationSettings component for user preferences
+- Push notification utility functions
+- Integration with bookings API for booking alerts
+- Functions for overdue, booking, and low stock alerts
+- NotificationSettings added to settings page
+
+---
 
 ### 1. Guard Profile Page (`/guards/[id]`)
 **Status:** ✅ **COMPLETED** - Fully implemented at `/guards/[id]` with all requested features including holdings, bookings, damaged/missing records, and deactivate toggle.  

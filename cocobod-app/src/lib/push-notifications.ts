@@ -84,11 +84,16 @@ export async function getPushSubscription(): Promise<PushSubscription | null> {
     return null
   }
 
+  const keys = subscription.toJSON().keys
+  if (!keys || !keys.p256dh || !keys.auth) {
+    return null
+  }
+
   return {
     endpoint: subscription.endpoint,
     keys: {
-      p256dh: subscription.toJSON().keys.p256dh,
-      auth: subscription.toJSON().keys.auth,
+      p256dh: keys.p256dh,
+      auth: keys.auth,
     },
   }
 }
@@ -112,16 +117,28 @@ export async function subscribeToPushNotifications(): Promise<boolean> {
   }
 
   try {
+    const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
+    if (!vapidKey) {
+      console.error('VAPID public key not configured')
+      return false
+    }
+
     const newSubscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || ''),
+      applicationServerKey: urlBase64ToUint8Array(vapidKey) as any,
     })
+
+    const keys = newSubscription.toJSON().keys
+    if (!keys || !keys.p256dh || !keys.auth) {
+      console.error('Invalid subscription keys')
+      return false
+    }
 
     const subscriptionData = {
       endpoint: newSubscription.endpoint,
       keys: {
-        p256dh: newSubscription.toJSON().keys.p256dh,
-        auth: newSubscription.toJSON().keys.auth,
+        p256dh: keys.p256dh,
+        auth: keys.auth,
       },
     }
 
@@ -132,7 +149,7 @@ export async function subscribeToPushNotifications(): Promise<boolean> {
   }
 }
 
-function urlBase64ToUint8Array(base64String: string): Uint8Array {
+function urlBase64ToUint8Array(base64String: string): BufferSource {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
   const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/')
   const rawData = window.atob(base64)
@@ -142,5 +159,5 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
     outputArray[i] = rawData.charCodeAt(i)
   }
 
-  return outputArray
+  return outputArray.buffer as ArrayBuffer
 }
