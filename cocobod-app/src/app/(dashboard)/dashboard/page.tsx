@@ -13,7 +13,6 @@ import DashboardQuickSearch from '@/components/dashboard/DashboardQuickSearch'
 import CategoryDistributionCard from '@/components/dashboard/CategoryDistributionCard'
 import OverviewChart from '@/components/dashboard/OverviewChart'
 import DashboardLiveUpdates from '@/components/dashboard/DashboardLiveUpdates'
-import { MobileDashboard } from '@/components/dashboard/MobileDashboard'
 import {
   Package,
   ArrowRight,
@@ -409,30 +408,16 @@ export default async function DashboardPage() {
 
   return (
     <DashboardLiveUpdates pollInterval={30000}>
-      {/* Mobile-Optimized Dashboard (hidden on desktop) */}
-      <MobileDashboard
-        stats={{
-          totalItems: stats.kpis.totalItems,
-          availableItems: stats.kpis.availableItems,
-          issuedItems: stats.kpis.issuedItems,
-          overdueCount: stats.kpis.overdueCount,
-          pendingBookings: stats.formula.pendingBookings,
-          lowStockCount: stats.lowStockItems?.length || 0,
-        }}
-      />
-
-      {/* Desktop Dashboard Content (hidden on mobile) */}
-      <div className="hidden lg:block space-y-6">
-        {/* Database Connection Warning */}
-        {!isDbConnected && (
-          <div className="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-lg p-4 flex items-center gap-3">
-            <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0" />
-            <div>
-              <p className="font-medium text-amber-900 dark:text-amber-200">Database Connection Unavailable</p>
-              <p className="text-sm text-amber-700 dark:text-amber-400">Unable to connect to the database. Please check your connection and try again.</p>
-            </div>
+      {/* Database Connection Warning */}
+      {!isDbConnected && (
+        <div className="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-lg p-4 flex items-center gap-3">
+          <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0" />
+          <div>
+            <p className="font-medium text-amber-900 dark:text-amber-200">Database Connection Unavailable</p>
+            <p className="text-sm text-amber-700 dark:text-amber-400">Unable to connect to the database. Please check your connection and try again.</p>
           </div>
-        )}
+        </div>
+      )}
 
       {/* Low Stock Alert */}
       {stats.lowStockItems && stats.lowStockItems.length > 0 && (
@@ -809,7 +794,6 @@ export default async function DashboardPage() {
         </Card>
       )}
 
-      </div>
     </DashboardLiveUpdates>
   )
 }
