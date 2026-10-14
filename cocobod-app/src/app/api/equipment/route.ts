@@ -12,6 +12,8 @@ export async function GET() {
       },
     })
 
+    console.log('Equipment from DB:', equipment.map(e => ({ id: e.id, itemName: e.itemName, itemNameLength: e.itemName.length })))
+
     return NextResponse.json(equipment)
   } catch (error) {
     console.error('Error fetching equipment:', error)

@@ -38,6 +38,8 @@ async function getEquipment(search?: string, category?: string) {
       orderBy: { itemName: 'asc' },
     })
 
+    console.log('Equipment from DB (SSR):', equipment.map(e => ({ id: e.id, itemName: e.itemName, itemNameLength: e.itemName.length })))
+
     const categories = await prisma.equipmentCategory.findMany({
       where: { isActive: true },
       orderBy: { name: 'asc' }
