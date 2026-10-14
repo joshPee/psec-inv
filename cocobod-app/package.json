@@ -5,11 +5,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "build:with-db": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
-    "postinstall": "prisma generate && prisma skills sync || exit 0",
+    "postinstall": "prisma generate",
     "contract:emit": "prisma contract emit",
     "seed": "ts-node prisma/seed.ts"
   },

@@ -3,6 +3,7 @@
   "version": "1.0.1",
   "private": true,
   "scripts": {
-    "vercel-build": "cd cocobod-app && npm run build:with-db"
+    "build": "cd cocobod-app && npm run build",
+    "vercel-build": "cd cocobod-app && npm run build"
   }
 }
