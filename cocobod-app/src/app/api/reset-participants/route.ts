@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Pool } from 'pg';
+import { Pool } from '@neondatabase/serverless';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
 
