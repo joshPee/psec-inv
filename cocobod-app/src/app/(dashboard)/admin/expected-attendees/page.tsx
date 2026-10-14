@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Upload, Download, CheckCircle, XCircle, Clock, Search, RefreshCw, Eye, Edit, Trash2 } from 'lucide-react';
+import { useToast } from '@/components/ui/toast';
 
 interface ExpectedAttendee {
   id: number;
@@ -26,6 +27,7 @@ interface ExpectedAttendee {
 }
 
 export default function ExpectedAttendeesPage() {
+  const { toast } = useToast();
   const [attendees, setAttendees] = useState<ExpectedAttendee[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -93,13 +95,14 @@ export default function ExpectedAttendeesPage() {
         setShowAddModal(false);
         setAddForm({ full_name: '', email: '', phone: '', organisation: '', position: '', region: '', tags: '' });
         fetchExpectedAttendees();
+        toast.success('Expected attendee added successfully');
       } else {
         const error = await response.json();
-        alert(error.error || 'Failed to add expected attendee');
+        toast.error(error.error || 'Failed to add expected attendee');
       }
     } catch (error) {
       console.error('Error adding expected attendee:', error);
-      alert('An error occurred while adding expected attendee');
+      toast.error('An error occurred while adding expected attendee');
     } finally {
       setAdding(false);
     }
@@ -121,13 +124,14 @@ export default function ExpectedAttendeesPage() {
         setShowEditModal(false);
         setSelectedAttendee(null);
         fetchExpectedAttendees();
+        toast.success('Expected attendee updated successfully');
       } else {
         const error = await response.json();
-        alert(error.error || 'Failed to update expected attendee');
+        toast.error(error.error || 'Failed to update expected attendee');
       }
     } catch (error) {
       console.error('Error updating expected attendee:', error);
-      alert('An error occurred while updating expected attendee');
+      toast.error('An error occurred while updating expected attendee');
     } finally {
       setEditing(false);
     }
@@ -182,7 +186,7 @@ export default function ExpectedAttendeesPage() {
       document.body.removeChild(a);
     } catch (error) {
       console.error('Error exporting:', error);
-      alert('Failed to export list');
+      toast.error('Failed to export list');
     }
   };
 

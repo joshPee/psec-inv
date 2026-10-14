@@ -16,12 +16,25 @@ import {
 } from '@/components/ui/dialog'
 import { Plus, Edit, Trash2, Package, Layers, Search, ShieldCheck, Box } from 'lucide-react'
 import { useToast } from '@/components/ui/toast'
+import { PageHeader } from '@/components/ui/page-header'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
+import { EmptyState } from '@/components/ui/empty-state'
+
+interface EquipmentCategory {
+  id: string
+  name: string
+  description?: string | null
+  _count?: {
+    equipment?: number
+  }
+}
 
 export default function EquipmentCategoriesPage() {
   const { toast } = useToast()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [editingCategory, setEditingCategory] = useState<any>(null)
-  const [categories, setCategories] = useState<any[]>([])
+  const [editingCategory, setEditingCategory] = useState<EquipmentCategory | null>(null)
+  const [categoryToDelete, setCategoryToDelete] = useState<EquipmentCategory | null>(null)
+  const [categories, setCategories] = useState<EquipmentCategory[]>([])
   const [searchQuery, setSearchQuery] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -134,26 +147,21 @@ export default function EquipmentCategoriesPage() {
 
   return (
     <div className="space-y-6">
-      {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-700 p-6 md:p-8 text-white shadow-lg">
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md text-emerald-100 text-xs font-semibold mb-3 border border-white/20">
-              <Layers className="h-3.5 w-3.5" />
-              <span>Catalog Structure</span>
-            </div>
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white">
-              Equipment Categories
-            </h1>
-            <p className="mt-1 text-sm md:text-base text-emerald-100/90 max-w-xl">
-              Organize security items, gear, and supplies into structured inventory groups.
-            </p>
-          </div>
-
+      {/* Modern Page Header */}
+      <PageHeader
+        icon={Layers}
+        title="Equipment Categories"
+        subtitle="Organize security items, gear, and supplies into structured inventory groups and classification hierarchies."
+        badge="Catalog Architecture"
+        color="teal"
+        stats={[
+          { label: 'Categories', value: categories.length },
+        ]}
+        actions={
           <div className="flex items-center gap-3">
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
-                <Button className="bg-white text-emerald-700 hover:bg-emerald-50 shadow-md font-semibold transition-all">
+                <Button className="bg-teal-600 hover:bg-teal-500 text-white shadow-md font-semibold transition-all">
                   <Plus className="h-4 w-4 mr-2" />
                   New Category
                 </Button>
@@ -233,12 +241,8 @@ export default function EquipmentCategoriesPage() {
               </DialogContent>
             </Dialog>
           </div>
-        </div>
-
-        {/* Background glow effects */}
-        <div className="absolute -top-24 -right-24 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-emerald-950/20 rounded-full blur-3xl pointer-events-none" />
-      </div>
+        }
+      />
 
       {/* Overview Stat Cards & Search */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -361,7 +365,7 @@ export default function EquipmentCategoriesPage() {
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={() => handleDelete(category.id)}
+                      onClick={() => setCategoryToDelete(category)}
                       className="h-8 w-8 p-0 text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 rounded-lg"
                       title="Delete Category"
                     >
@@ -386,6 +390,29 @@ export default function EquipmentCategoriesPage() {
           ))
         )}
       </div>
+
+      {/* Confirmation Dialog for Category Deletion */}
+      <ConfirmDialog
+        open={!!categoryToDelete}
+        onOpenChange={(open) => {
+          if (!open) setCategoryToDelete(null)
+        }}
+        title="Delete Equipment Category"
+        description={
+          categoryToDelete
+            ? `Are you sure you want to delete category "${categoryToDelete.name}"? This action cannot be undone.`
+            : ''
+        }
+        confirmLabel="Delete Category"
+        variant="destructive"
+        icon={Trash2}
+        onConfirm={async () => {
+          if (categoryToDelete) {
+            await handleDelete(categoryToDelete.id)
+            setCategoryToDelete(null)
+          }
+        }}
+      />
     </div>
   )
 }

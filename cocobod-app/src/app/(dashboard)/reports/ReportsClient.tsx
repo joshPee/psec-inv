@@ -23,6 +23,7 @@ import {
 } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import { PageHeader } from '@/components/ui/page-header'
 
 interface CategoryStats {
   id: string
@@ -143,26 +144,14 @@ export function ReportsClient({ categoryStats, initialStartDate, initialEndDate 
 
   return (
     <div className="space-y-8">
-      {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-slate-800 p-6 sm:p-8 text-white shadow-xl">
-        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.3) 0%, transparent 60%), radial-gradient(circle at 80% 50%, rgba(139, 92, 246, 0.2) 0%, transparent 60%)' }} />
-        <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-500/30 text-indigo-200 border border-indigo-400/30">
-                Analytics
-              </span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight flex items-center gap-3">
-              <BarChart3 className="h-7 w-7 text-indigo-400" />
-              Reports & Exports
-            </h1>
-            <p className="text-sm text-slate-300 mt-1.5 max-w-2xl">
-              Generate, filter, and export detailed system reports. All data can be exported as CSV for analysis.
-            </p>
-          </div>
-        </div>
-      </div>
+      {/* Modern Page Header */}
+      <PageHeader
+        icon={BarChart3}
+        title="Reports & Analytics"
+        subtitle="Generate, filter, and export comprehensive audits across inventory distribution, guard assignments, loss, and equipment damage."
+        badge="Intelligence & Audit"
+        color="indigo"
+      />
 
       {/* Date Range Filter */}
       <Card className="group relative border border-slate-200/80 dark:border-slate-700/60 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm shadow-sm overflow-hidden">

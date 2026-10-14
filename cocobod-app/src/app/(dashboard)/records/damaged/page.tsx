@@ -40,6 +40,7 @@ import {
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useToast } from '@/components/ui/toast'
+import { PageHeader } from '@/components/ui/page-header'
 
 import { Suspense } from 'react'
 
@@ -279,23 +280,14 @@ function DamagedItemsContent() {
 
   return (
     <div className="space-y-6">
-      {/* Top Banner / Hero Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-amber-600 via-rose-600 to-red-600 p-6 md:p-8 text-white shadow-lg">
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md text-amber-100 text-xs font-semibold mb-3 border border-white/20">
-              <ShieldAlert className="h-3.5 w-3.5" />
-              <span>Equipment Incident Log</span>
-            </div>
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white">
-              Damaged Equipment Records
-            </h1>
-            <p className="mt-1 text-sm md:text-base text-amber-100/90 max-w-xl">
-              Monitor, audit, and reconcile damaged security gear. Track repairs and restore functional items to active stock.
-            </p>
-          </div>
-
-          {/* Action Buttons */}
+      {/* Modern Page Header */}
+      <PageHeader
+        icon={ShieldAlert}
+        title="Damaged Equipment Records"
+        subtitle="Monitor, audit, and reconcile damaged security gear. Track repair statuses and restore functional items to active stock."
+        badge="Incident & Damage Log"
+        color="amber"
+        actions={
           <div className="flex flex-wrap items-center gap-2.5">
             <Button
               onClick={handleExportCSV}
@@ -316,7 +308,7 @@ function DamagedItemsContent() {
 
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
-                <Button className="bg-white text-rose-700 hover:bg-rose-50 shadow-md font-semibold transition-all">
+                <Button className="bg-amber-600 hover:bg-amber-500 text-white shadow-md font-semibold transition-all">
                   <Plus className="h-4 w-4 mr-2" />
                   Record Damage
                 </Button>
@@ -461,12 +453,8 @@ function DamagedItemsContent() {
               </DialogContent>
             </Dialog>
           </div>
-        </div>
-
-        {/* Decorative background glow */}
-        <div className="absolute -top-24 -right-24 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-rose-950/20 rounded-full blur-3xl pointer-events-none" />
-      </div>
+        }
+      />
 
       {/* KPI Overview Strip */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

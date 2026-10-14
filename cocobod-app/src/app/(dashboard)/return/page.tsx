@@ -26,6 +26,7 @@ import {
 } from '@/components/ui/select'
 import { Search, RotateCcw, History, Package, Lock } from 'lucide-react'
 import { useToast } from '@/components/ui/toast'
+import { PageHeader } from '@/components/ui/page-header'
 
 import { Suspense } from 'react'
 
@@ -173,26 +174,18 @@ function ReturnEquipmentContent() {
 
   return (
     <div className="space-y-6">
-      {/* Page Header with Gradient */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 border border-slate-800 p-6 sm:p-8 text-white shadow-xl">
-        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 30% 50%, rgba(59, 130, 246, 0.3) 0%, transparent 60%), radial-gradient(circle at 70% 50%, rgba(99, 102, 241, 0.2) 0%, transparent 60%)' }} />
-        <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-500/30 text-blue-200 border border-blue-400/30">
-                Returns
-              </span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight flex items-center gap-3">
-              <RotateCcw className="h-7 w-7 text-blue-400" />
-              Return Equipment
-            </h1>
-            <p className="text-sm text-slate-300 mt-1">Process and track equipment returns from guards</p>
-          </div>
-          {(userRole === 'EQUIPMENT_CUSTODIAN' || userRole === 'SECURITY_SUPERVISOR' || userRole === null) ? (
+      {/* Modern Page Header */}
+      <PageHeader
+        icon={RotateCcw}
+        title="Return Equipment"
+        subtitle="Process and track equipment returns, condition checks, and inventory reconciliations."
+        badge="Returns & Restock"
+        color="blue"
+        actions={
+          (userRole === 'EQUIPMENT_CUSTODIAN' || userRole === 'SECURITY_SUPERVISOR' || userRole === null) ? (
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-sm">
+                <Button className="bg-blue-600 hover:bg-blue-500 text-white font-medium shadow-md transition-all">
                   <RotateCcw className="h-4 w-4 mr-2" />
                   Return Equipment
                 </Button>
@@ -277,15 +270,15 @@ function ReturnEquipmentContent() {
             </DialogContent>
           </Dialog>
           ) : userRole ? (
-            <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800">
-              <Lock className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-              <span className="text-sm text-amber-800 dark:text-amber-300 font-medium">
+            <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20 backdrop-blur-md">
+              <Lock className="h-4 w-4 text-amber-400" />
+              <span className="text-xs text-amber-200 font-medium">
                 Read-only view - Only Custodians and Supervisors can process returns
               </span>
             </div>
-          ) : null}
-        </div>
-      </div>
+          ) : null
+        }
+      />
 
       {/* Search */}
       <Card className="group relative border border-slate-200/80 dark:border-slate-700/60 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm shadow-sm overflow-hidden">

@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Eye, ArrowLeft, Search, Shield, Package, Clock, CheckCircle2, RotateCcw, AlertTriangle, CalendarClock, Filter } from 'lucide-react'
 import { useToast } from '@/components/ui/toast'
 import { StatusBadge } from '@/components/ui/status-badge'
+import { PageHeader } from '@/components/ui/page-header'
 
 interface ActiveIssuedClientProps {
   activeItems: any[]
@@ -214,27 +215,14 @@ export default function ActiveIssuedClient({ activeItems, userRole }: ActiveIssu
 
   return (
     <div className="space-y-6">
-      {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-700 p-6 md:p-8 text-white shadow-lg">
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md text-blue-100 text-xs font-semibold mb-3 border border-white/20">
-              <Shield className="h-3.5 w-3.5" />
-              <span>Custody Tracking</span>
-            </div>
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white">
-              Active Issued Items
-            </h1>
-            <p className="mt-1 text-sm md:text-base text-blue-100/90 max-w-xl">
-              Real-time oversight of security equipment currently assigned and deployed across duty posts.
-            </p>
-          </div>
-        </div>
-
-        {/* Decorative background glow */}
-        <div className="absolute -top-24 -right-24 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-indigo-950/20 rounded-full blur-3xl pointer-events-none" />
-      </div>
+      {/* Modern Page Header */}
+      <PageHeader
+        icon={Shield}
+        title="Active Issued Items"
+        subtitle="Real-time oversight of security equipment currently assigned and deployed across duty posts."
+        badge="Live Custody Tracking"
+        color="blue"
+      />
 
       {/* KPI Overview Strip */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">

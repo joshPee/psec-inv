@@ -15,7 +15,25 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { useToast } from '@/components/ui/toast'
-import { Calendar, Plus, CheckCircle, X, Clock, AlertCircle, Package, ArrowRight, MoreVertical, CalendarClock } from 'lucide-react'
+import {
+  Calendar,
+  Plus,
+  CheckCircle,
+  X,
+  Clock,
+  AlertCircle,
+  Package,
+  ArrowRight,
+  MoreVertical,
+  CalendarClock,
+  ChevronLeft,
+  ChevronRight,
+  AlertTriangle,
+  Ban
+} from 'lucide-react'
+import { PageHeader } from '@/components/ui/page-header'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
+import { EmptyState } from '@/components/ui/empty-state'
 
 interface Booking {
   id: string
@@ -33,6 +51,20 @@ interface Booking {
   createdAt: string
 }
 
+interface GuardOption {
+  id: string
+  fullName: string
+  badgeId: string
+  staffId?: string
+}
+
+interface EquipmentOption {
+  id: string
+  itemName: string
+  itemCode: string
+  availableQuantity: number
+}
+
 interface Summary {
   pending: number
   approved: number
@@ -48,9 +80,17 @@ export default function BookingsClient({ bookings, summary }: { bookings: Bookin
   const [isFulfillDialogOpen, setIsFulfillDialogOpen] = useState(false)
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null)
   const [activeTab, setActiveTab] = useState<'pending' | 'approved' | 'fulfilled' | 'cancelled'>('pending')
-  const [guards, setGuards] = useState<any[]>([])
-  const [equipment, setEquipment] = useState<any[]>([])
+  const [currentPage, setCurrentPage] = useState(1)
+  const pageSize = 10
+  const [guards, setGuards] = useState<GuardOption[]>([])
+  const [equipment, setEquipment] = useState<EquipmentOption[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [confirmAction, setConfirmAction] = useState<{
+    bookingId: string
+    action: 'reject' | 'cancel'
+    guardName: string
+    equipmentName: string
+  } | null>(null)
 
   useEffect(() => {
     Promise.all([
@@ -71,6 +111,9 @@ export default function BookingsClient({ bookings, summary }: { bookings: Bookin
       default: return true
     }
   })
+
+  const totalPages = Math.max(1, Math.ceil(filteredBookings.length / pageSize))
+  const paginatedBookings = filteredBookings.slice((currentPage - 1) * pageSize, currentPage * pageSize)
 
   async function handleCreateBooking(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -161,25 +204,17 @@ export default function BookingsClient({ bookings, summary }: { bookings: Bookin
 
   return (
     <div className="space-y-6">
-      {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-cyan-950 to-slate-900 border border-slate-800 p-6 md:p-8 text-white shadow-xl">
-        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 30% 50%, rgba(6, 182, 212, 0.3) 0%, transparent 60%), radial-gradient(circle at 70% 50%, rgba(34, 211, 238, 0.2) 0%, transparent 60%)' }} />
-        <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-cyan-500/30 text-cyan-200 border border-cyan-400/30">
-                Reservations
-              </span>
-            </div>
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-3">
-              <CalendarClock className="h-7 w-7 text-cyan-400" />
-              Bookings Queue
-            </h1>
-            <p className="text-sm text-slate-300 mt-1">Manage equipment reservations and advance bookings</p>
-          </div>
+      {/* Modern Page Header */}
+      <PageHeader
+        icon={CalendarClock}
+        title="Bookings & Reservations"
+        subtitle="Manage duty equipment reservations, schedule advance bookings, and review approval workflows."
+        badge="Advance Reservations"
+        color="cyan"
+        actions={
           <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-cyan-600 hover:bg-cyan-700 text-white font-medium shadow-sm">
+              <Button className="bg-cyan-600 hover:bg-cyan-500 text-white font-medium shadow-md transition-all">
                 <Plus className="h-4 w-4 mr-2" />
                 New Booking
               </Button>
@@ -291,8 +326,8 @@ export default function BookingsClient({ bookings, summary }: { bookings: Bookin
             </form>
             </DialogContent>
           </Dialog>
-        </div>
-      </div>
+        }
+      />
 
       {/* Summary KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -364,7 +399,10 @@ export default function BookingsClient({ bookings, summary }: { bookings: Bookin
                   key={tab}
                   variant={activeTab === tab ? 'default' : 'outline'}
                   size="sm"
-                  onClick={() => setActiveTab(tab)}
+                  onClick={() => {
+                    setActiveTab(tab)
+                    setCurrentPage(1)
+                  }}
                   className={activeTab === tab ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'dark:border-slate-700 dark:hover:bg-slate-800'}
                 >
                   {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -393,12 +431,16 @@ export default function BookingsClient({ bookings, summary }: { bookings: Bookin
               <tbody>
                 {filteredBookings.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="py-8 text-center text-slate-500 dark:text-slate-400">
-                      No bookings found
+                    <td colSpan={7} className="p-8">
+                      <EmptyState
+                        icon={CalendarClock}
+                        title={`No ${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Bookings`}
+                        description={`There are currently no bookings with ${activeTab} status.`}
+                      />
                     </td>
                   </tr>
                 ) : (
-                  filteredBookings.map((booking) => (
+                  paginatedBookings.map((booking) => (
                     <tr key={booking.id} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                       <td className="py-3 px-4">
                         <div>
@@ -436,8 +478,18 @@ export default function BookingsClient({ bookings, summary }: { bookings: Bookin
                                   <CheckCircle className="h-4 w-4 mr-2 text-emerald-500" />
                                   Approve
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => handleBookingAction(booking.id, 'reject')} className="text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">
-                                  <X className="h-4 w-4 mr-2 text-red-500" />
+                                <DropdownMenuItem
+                                  onClick={() =>
+                                    setConfirmAction({
+                                      bookingId: booking.id,
+                                      action: 'reject',
+                                      guardName: booking.guard.fullName,
+                                      equipmentName: booking.equipment.itemName,
+                                    })
+                                  }
+                                  className="text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40"
+                                >
+                                  <X className="h-4 w-4 mr-2 text-rose-500" />
                                   Reject
                                 </DropdownMenuItem>
                               </>
@@ -448,9 +500,19 @@ export default function BookingsClient({ bookings, summary }: { bookings: Bookin
                                   <ArrowRight className="h-4 w-4 mr-2 text-blue-500" />
                                   Fulfill & Issue
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => handleBookingAction(booking.id, 'cancel')} className="text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">
-                                  <X className="h-4 w-4 mr-2 text-slate-500" />
-                                  Cancel
+                                <DropdownMenuItem
+                                  onClick={() =>
+                                    setConfirmAction({
+                                      bookingId: booking.id,
+                                      action: 'cancel',
+                                      guardName: booking.guard.fullName,
+                                      equipmentName: booking.equipment.itemName,
+                                    })
+                                  }
+                                  className="text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+                                >
+                                  <Ban className="h-4 w-4 mr-2 text-slate-500" />
+                                  Cancel Booking
                                 </DropdownMenuItem>
                               </>
                             )}
@@ -463,6 +525,52 @@ export default function BookingsClient({ bookings, summary }: { bookings: Bookin
               </tbody>
             </table>
           </div>
+
+          {/* Pagination Controls */}
+          {filteredBookings.length > pageSize && (
+            <div className="flex items-center justify-between px-4 py-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Showing{' '}
+                <span className="font-medium text-slate-900 dark:text-white">
+                  {(currentPage - 1) * pageSize + 1}
+                </span>{' '}
+                to{' '}
+                <span className="font-medium text-slate-900 dark:text-white">
+                  {Math.min(currentPage * pageSize, filteredBookings.length)}
+                </span>{' '}
+                of{' '}
+                <span className="font-medium text-slate-900 dark:text-white">
+                  {filteredBookings.length}
+                </span>{' '}
+                bookings
+              </p>
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  disabled={currentPage === 1}
+                  className="h-8 px-2 text-xs border-slate-200 dark:border-slate-700"
+                >
+                  <ChevronLeft className="h-3.5 w-3.5 mr-1" />
+                  Previous
+                </Button>
+                <span className="text-xs text-slate-600 dark:text-slate-300 px-2 font-medium">
+                  {currentPage} of {totalPages}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                  disabled={currentPage >= totalPages}
+                  className="h-8 px-2 text-xs border-slate-200 dark:border-slate-700"
+                >
+                  Next
+                  <ChevronRight className="h-3.5 w-3.5 ml-1" />
+                </Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -528,6 +636,30 @@ export default function BookingsClient({ bookings, summary }: { bookings: Bookin
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Confirm Reject / Cancel Action Dialog */}
+      <ConfirmDialog
+        open={!!confirmAction}
+        onOpenChange={(open) => {
+          if (!open) setConfirmAction(null)
+        }}
+        title={confirmAction?.action === 'reject' ? 'Reject Booking Request' : 'Cancel Equipment Booking'}
+        description={
+          confirmAction
+            ? `Are you sure you want to ${confirmAction.action} the booking of ${confirmAction.equipmentName} for guard ${confirmAction.guardName}?`
+            : ''
+        }
+        confirmLabel={confirmAction?.action === 'reject' ? 'Reject Booking' : 'Cancel Booking'}
+        variant={confirmAction?.action === 'reject' ? 'destructive' : 'warning'}
+        icon={confirmAction?.action === 'reject' ? X : Ban}
+        loading={isSubmitting}
+        onConfirm={async () => {
+          if (confirmAction) {
+            await handleBookingAction(confirmAction.bookingId, confirmAction.action)
+            setConfirmAction(null)
+          }
+        }}
+      />
     </div>
   )
 }

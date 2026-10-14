@@ -7,10 +7,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { ClipboardList, Plus, Search, Trash2, Edit, CheckCircle, XCircle, Clock, Download, FileText } from 'lucide-react';
+import { PageHeader } from '@/components/ui/page-header';
+import { useToast } from '@/components/ui/toast';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
 export default function ShiftHandoverPage() {
+  const { toast } = useToast();
   const [handovers, setHandovers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -291,7 +294,7 @@ export default function ShiftHandoverPage() {
       doc.save(`shift-handover-${handover.shift_date}.pdf`);
     } catch (error) {
       console.error('Error generating PDF:', error);
-      alert('Failed to generate PDF. Please try again.');
+      toast.error('Failed to generate PDF. Please try again.');
     }
   };
 
@@ -303,37 +306,44 @@ export default function ShiftHandoverPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Shift Handover</h1>
-        <div className="flex gap-2">
-          <Button
-            onClick={() => {
-              const today = new Date().toISOString().split('T')[0];
-              setFormData({
-                ...formData,
-                shift_date: today,
-              });
-              setShowForm(true);
-            }}
-            variant="outline"
-            className="border-[#123B70] text-[#123B70] hover:bg-[#123B70]/10"
-          >
-            <FileText className="h-4 w-4 mr-2" />
-            Generate Report
-          </Button>
-          <Button
-            onClick={() => setShowForm(!showForm)}
-            className="bg-[#123B70] hover:bg-[#0d2d52]"
-          >
-            {showForm ? 'Cancel' : (
-              <>
-                <Plus className="h-4 w-4 mr-2" />
-                Create Handover
-              </>
-            )}
-          </Button>
-        </div>
-      </div>
+      <PageHeader
+        icon={ClipboardList}
+        badge="Operations"
+        title="Shift Handover"
+        description="Log and track shift handover records between outgoing and incoming security officers."
+        color="indigo"
+        stats={[
+          { label: 'Total Records', value: handovers.length },
+          { label: 'Filtered', value: filteredHandovers.length },
+        ]}
+        actions={
+          <div className="flex gap-2">
+            <Button
+              onClick={() => {
+                const today = new Date().toISOString().split('T')[0];
+                setFormData({ ...formData, shift_date: today });
+                setShowForm(true);
+              }}
+              variant="outline"
+              className="border-white/20 text-white bg-white/10 hover:bg-white/20 text-xs"
+            >
+              <FileText className="h-4 w-4 mr-2" />
+              Generate Report
+            </Button>
+            <Button
+              onClick={() => setShowForm(!showForm)}
+              className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium shadow-sm"
+            >
+              {showForm ? 'Cancel' : (
+                <>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create Handover
+                </>
+              )}
+            </Button>
+          </div>
+        }
+      />
 
       {message && (
         <div className={`px-3 py-2 rounded-lg flex items-start gap-2 text-sm ${

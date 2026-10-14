@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { PlusCircle, ArrowLeft, AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { AddEquipmentForm } from './AddEquipmentForm'
+import { PageHeader } from '@/components/ui/page-header'
 
 async function getCategories() {
   try {
@@ -31,30 +32,25 @@ export default async function AddEquipmentPage() {
 
   return (
     <div className="space-y-6">
-      {/* Page Header with Gradient */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-emerald-950 to-slate-900 border border-slate-800 p-6 sm:p-8 text-white shadow-xl">
-        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 30% 50%, rgba(16, 185, 129, 0.3) 0%, transparent 60%), radial-gradient(circle at 70% 50%, rgba(52, 211, 153, 0.2) 0%, transparent 60%)' }} />
-        <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/30 text-emerald-200 border border-emerald-400/30">
-                New Entry
-              </span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight flex items-center gap-3">
-              <PlusCircle className="h-7 w-7 text-emerald-400" />
-              Add Equipment
-            </h1>
-            <p className="text-sm text-slate-300 mt-1">Register new equipment into the inventory system</p>
-          </div>
+      {/* Modern Hero Header */}
+      <PageHeader
+        icon={PlusCircle}
+        badge="New Inventory Entry"
+        title="Add Equipment"
+        description="Register and provision new security equipment and assets into the central database."
+        color="emerald"
+        stats={[
+          { label: 'Active Categories', value: categories.length },
+        ]}
+        actions={
           <Link href="/inventory">
             <Button variant="secondary" className="bg-white/10 hover:bg-white/20 text-white border border-white/10 text-xs">
               <ArrowLeft className="h-4 w-4 mr-1.5" />
               Back to Inventory
             </Button>
           </Link>
-        </div>
-      </div>
+        }
+      />
 
       {/* Interactive Form with Toast Feedback and Pending State */}
       <AddEquipmentForm categories={categories} />

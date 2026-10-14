@@ -8,11 +8,25 @@ import { Label } from '@/components/ui/label'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Plus, Edit, Trash2, Users } from 'lucide-react'
 import { useToast } from '@/components/ui/toast'
+import { PageHeader } from '@/components/ui/page-header'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
+import { EmptyState } from '@/components/ui/empty-state'
+
+interface AdminUser {
+  id: string
+  fullName: string
+  staffId: string
+  email: string
+  role: string
+  isActive: boolean
+  createdAt: string
+}
 
 export default function UserManagementPage() {
   const { toast } = useToast()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [users, setUsers] = useState<any[]>([])
+  const [users, setUsers] = useState<AdminUser[]>([])
+  const [userToDelete, setUserToDelete] = useState<AdminUser | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -72,8 +86,7 @@ export default function UserManagementPage() {
     }
   }
 
-  async function deleteUser(formData: FormData) {
-    const userId = formData.get('userId') as string
+  async function deleteUser(userId: string) {
     setLoading(true)
     setError('')
 
@@ -105,25 +118,22 @@ export default function UserManagementPage() {
 
   return (
     <div className="space-y-8">
-      {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-purple-950 to-slate-900 border border-slate-800 p-6 md:p-8 text-white shadow-xl">
-        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 30% 50%, rgba(168, 85, 247, 0.3) 0%, transparent 60%), radial-gradient(circle at 70% 50%, rgba(192, 132, 252, 0.2) 0%, transparent 60%)' }} />
-        <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-purple-500/30 text-purple-200 border border-purple-400/30">
-                Administration
-              </span>
-            </div>
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-3">
-              <Users className="h-7 w-7 text-purple-400" />
-              User Management
-            </h1>
-            <p className="text-sm text-slate-300 mt-1">Manage system users and permissions</p>
-          </div>
+      {/* Modern Hero Header */}
+      <PageHeader
+        icon={Users}
+        badge="Administration"
+        title="User Management"
+        description="Manage system users, assigned roles, security credentials, and access permissions."
+        color="violet"
+        stats={[
+          { label: 'Registered Users', value: users.length },
+          { label: 'Supervisors', value: users.filter(u => u.role === 'SECURITY_SUPERVISOR').length },
+          { label: 'Custodians', value: users.filter(u => u.role === 'EQUIPMENT_CUSTODIAN').length },
+        ]}
+        actions={
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-purple-600 hover:bg-purple-700 text-white font-medium shadow-sm">
+              <Button className="bg-violet-600 hover:bg-violet-700 text-white font-medium shadow-sm">
                 <Plus className="h-4 w-4 mr-2" />
                 Add User
               </Button>
@@ -217,8 +227,8 @@ export default function UserManagementPage() {
             </form>
             </DialogContent>
           </Dialog>
-        </div>
-      </div>
+        }
+      />
 
       {/* Users List */}
       <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
@@ -271,26 +281,60 @@ export default function UserManagementPage() {
                         <Button size="sm" variant="ghost" className="text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800">
                           <Edit className="h-4 w-4" />
                         </Button>
-                        <form action={deleteUser}>
-                          <input type="hidden" name="userId" value={user.id} />
-                          <Button 
-                            size="sm" 
-                            variant="ghost" 
-                            type="submit"
-                            className="text-rose-600 hover:text-rose-700 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </form>
+                        <Button 
+                          size="sm" 
+                          variant="ghost" 
+                          type="button"
+                          onClick={() => setUserToDelete(user)}
+                          className="text-rose-600 hover:text-rose-700 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40"
+                          title="Delete user"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </div>
                     </td>
                   </tr>
                 ))}
+                {users.length === 0 && (
+                  <tr>
+                    <td colSpan={7} className="p-8">
+                      <EmptyState
+                        icon={Users}
+                        title="No Users Registered"
+                        description="There are currently no supervisor or custodian accounts in the system."
+                      />
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
         </CardContent>
       </Card>
+
+      {/* Confirmation Dialog for User Deletion */}
+      <ConfirmDialog
+        open={!!userToDelete}
+        onOpenChange={(open) => {
+          if (!open) setUserToDelete(null)
+        }}
+        title="Delete User Account"
+        description={
+          userToDelete
+            ? `Are you sure you want to delete ${userToDelete.fullName} (${userToDelete.staffId})? This will permanently revoke their access credentials.`
+            : ''
+        }
+        confirmLabel="Delete User"
+        variant="destructive"
+        icon={Trash2}
+        loading={loading}
+        onConfirm={async () => {
+          if (userToDelete) {
+            await deleteUser(userToDelete.id)
+            setUserToDelete(null)
+          }
+        }}
+      />
     </div>
   )
 }

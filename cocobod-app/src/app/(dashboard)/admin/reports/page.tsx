@@ -6,8 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Calendar, Download, BarChart3, TrendingUp } from 'lucide-react';
+import { useToast } from '@/components/ui/toast';
 
 export default function ReportsPage() {
+  const { toast } = useToast();
   const [dateRange, setDateRange] = useState('today');
   const [reportType, setReportType] = useState('daily');
   const [visitorData, setVisitorData] = useState<any[]>([]);
@@ -48,7 +50,7 @@ export default function ReportsPage() {
       const maxDays = 90; // 3 months approximately
       
       if (diffDays > maxDays) {
-        alert('Date range cannot exceed 3 months (90 days)');
+        toast.error('Date range cannot exceed 3 months (90 days)');
         setEndDate('');
         return false;
       }
@@ -86,7 +88,7 @@ export default function ReportsPage() {
 
   const handleExport = (format: string) => {
     if (visitorData.length === 0) {
-      alert('No data to export');
+      toast.error('No data to export');
       return;
     }
 

@@ -20,6 +20,8 @@ import { Combobox } from '@/components/ui/combobox'
 import { Search, AlertCircle, Plus, Download, FileText, CheckCircle, Archive, TriangleAlert } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useToast } from '@/components/ui/toast'
+import { PageHeader } from '@/components/ui/page-header'
+import { EmptyState } from '@/components/ui/empty-state'
 
 import { Suspense } from 'react'
 
@@ -230,34 +232,26 @@ function MissingItemsContent() {
 
   return (
     <div className="space-y-6">
-      {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-rose-600 via-orange-600 to-amber-600 p-6 md:p-8 text-white shadow-xl">
-        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 30% 50%, rgba(244, 63, 94, 0.3) 0%, transparent 60%), radial-gradient(circle at 70% 50%, rgba(251, 146, 60, 0.2) 0%, transparent 60%)' }} />
-        <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-500/30 text-rose-100 border border-rose-400/30">
-                Loss Tracking
-              </span>
-            </div>
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-3">
-              <TriangleAlert className="h-7 w-7 text-rose-200" />
-              Missing Items
-            </h1>
-            <p className="text-sm text-rose-100/90 mt-1">Track and record missing equipment</p>
-          </div>
-          <div className="flex gap-2">
-            <Button onClick={handleExportCSV} variant="secondary" className="bg-white/10 hover:bg-white/20 text-white border border-white/10 text-xs">
+      {/* Modern Page Header */}
+      <PageHeader
+        icon={TriangleAlert}
+        title="Missing Equipment Records"
+        subtitle="Track unreturned assets, record disappearance investigations, and manage equipment recovery."
+        badge="Asset Protection"
+        color="rose"
+        actions={
+          <div className="flex flex-wrap items-center gap-2">
+            <Button onClick={handleExportCSV} variant="secondary" className="bg-white/10 hover:bg-white/20 text-white border border-white/15 text-xs">
               <Download className="h-4 w-4 mr-2" />
               Export CSV
             </Button>
-            <Button onClick={handleExportPDF} variant="secondary" className="bg-white/10 hover:bg-white/20 text-white border border-white/10 text-xs">
+            <Button onClick={handleExportPDF} variant="secondary" className="bg-white/10 hover:bg-white/20 text-white border border-white/15 text-xs">
               <FileText className="h-4 w-4 mr-2" />
               Export PDF
             </Button>
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
-                <Button className="bg-rose-600 hover:bg-rose-700 text-white font-medium shadow-sm">
+                <Button className="bg-rose-600 hover:bg-rose-500 text-white font-medium shadow-md transition-all">
                   <Plus className="h-4 w-4 mr-2" />
                   Record Missing
                 </Button>
@@ -331,8 +325,8 @@ function MissingItemsContent() {
               </DialogContent>
             </Dialog>
           </div>
-        </div>
-      </div>
+        }
+      />
 
       {/* Filters */}
       <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
@@ -390,7 +384,12 @@ function MissingItemsContent() {
         </CardHeader>
         <CardContent>
           {filteredRecords.length === 0 ? (
-            <p className="text-slate-500 dark:text-slate-400">No active missing records</p>
+            <EmptyState
+              icon={CheckCircle}
+              title="No Missing Records Found"
+              description="All equipment inventory is accounted for with no open missing logs."
+              className="py-12"
+            />
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">

@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ShieldCheck, TrendingUp, RotateCcw, Calendar, Search, Activity, ChevronDown, ChevronUp, Monitor } from 'lucide-react'
+import { PageHeader } from '@/components/ui/page-header'
 
 interface Movement {
   id: string
@@ -67,24 +68,19 @@ export default function CustodianActivityClient({ activityData }: { activityData
 
   return (
     <div className="space-y-6">
-      {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-violet-950 to-slate-900 border border-slate-800 p-6 md:p-8 text-white shadow-xl">
-        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 30% 50%, rgba(139, 92, 246, 0.3) 0%, transparent 60%), radial-gradient(circle at 70% 50%, rgba(167, 139, 250, 0.2) 0%, transparent 60%)' }} />
-        <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-violet-500/30 text-violet-200 border border-violet-400/30">
-                Audit Operations
-              </span>
-            </div>
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-3">
-              <Monitor className="h-7 w-7 text-violet-400" />
-              Custodian Activity Monitor
-            </h1>
-            <p className="text-sm text-slate-300 mt-1">Real-time oversight of custodian operations</p>
-          </div>
-        </div>
-      </div>
+      {/* Modern Hero Header */}
+      <PageHeader
+        icon={Monitor}
+        badge="Audit Operations"
+        title="Custodian Activity Monitor"
+        description="Real-time operational intelligence, verification, and audit oversight of custodian actions."
+        color="violet"
+        stats={[
+          { label: 'Issues Today', value: totalIssuesIssued },
+          { label: 'Returns Processed', value: totalReturnsProcessed },
+          { label: 'Active Custodians', value: activityData.length },
+        ]}
+      />
 
       {/* Summary Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

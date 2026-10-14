@@ -2,9 +2,13 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Breadcrumb } from '@/components/ui/breadcrumb'
+import { PageHeader } from '@/components/ui/page-header'
+import { EmptyState } from '@/components/ui/empty-state'
 import {
   ArrowLeft,
   Package,
@@ -64,66 +68,51 @@ export default function EquipmentDetailClient({ equipment, userRole }: Equipment
 
   return (
     <div className="space-y-6">
-      {/* Back Button */}
-      <Button
-        variant="ghost"
-        onClick={() => router.push('/inventory')}
-        className="mb-4"
-      >
-        <ArrowLeft className="h-4 w-4 mr-2" />
-        Back to Inventory
-      </Button>
+      {/* Modern Breadcrumb */}
+      <Breadcrumb
+        items={[
+          { label: 'Inventory', href: '/inventory' },
+          { label: equipment.itemName },
+        ]}
+      />
 
-      {/* Equipment Header */}
-      <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
-        <CardContent className="p-6">
-          <div className="flex flex-col md:flex-row gap-6">
-            <div className="flex items-center justify-center w-24 h-24 rounded-2xl bg-gradient-to-br from-teal-500 to-cyan-600 text-white p-4 shrink-0">
-              <Package className="h-12 w-12" />
-            </div>
-            <div className="flex-1">
-              <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-                <div>
-                  <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{equipment.itemName}</h1>
-                  <div className="flex flex-wrap items-center gap-2 mt-2">
-                    <span className="text-sm text-slate-600 dark:text-slate-400 font-mono">
-                      {equipment.itemCode}
-                    </span>
-                    <Badge className={getConditionColor(equipment.defaultCondition)}>
-                      {equipment.defaultCondition}
-                    </Badge>
-                    {equipment.category && (
-                      <span className="text-sm text-slate-600 dark:text-slate-400 flex items-center gap-1">
-                        <Warehouse className="h-4 w-4" />
-                        {equipment.category.name}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-                <div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Total Quantity</p>
-                  <p className="font-semibold text-slate-900 dark:text-white">{equipment.totalQuantity}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Available</p>
-                  <p className="font-semibold text-emerald-600 dark:text-emerald-400">{equipment.availableQuantity}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Issued</p>
-                  <p className="font-semibold text-blue-600 dark:text-blue-400">{equipment.issuedQuantity}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Storage</p>
-                  <p className="font-semibold text-slate-900 dark:text-white">{equipment.storageLocation || 'N/A'}</p>
-                </div>
-              </div>
-            </div>
+      {/* Contextual Hero Header */}
+      <PageHeader
+        icon={Package}
+        badge={equipment.itemCode}
+        title={equipment.itemName}
+        subtitle={
+          equipment.category
+            ? `Category: ${equipment.category.name} • Location: ${equipment.storageLocation || 'Main Armory'}`
+            : `Storage Location: ${equipment.storageLocation || 'Main Armory'}`
+        }
+        color="teal"
+        stats={[
+          { label: 'Total Units', value: equipment.totalQuantity },
+          { label: 'Available', value: equipment.availableQuantity, highlight: equipment.availableQuantity > 0 },
+          { label: 'Currently Issued', value: equipment.issuedQuantity },
+          { label: 'Condition', value: equipment.defaultCondition || 'GOOD' },
+        ]}
+        actions={
+          <div className="flex items-center gap-2">
+            <Button
+              variant="secondary"
+              onClick={() => router.push('/inventory')}
+              className="bg-white/10 hover:bg-white/20 text-white border border-white/10 text-xs"
+            >
+              <ArrowLeft className="h-4 w-4 mr-1.5" />
+              All Inventory
+            </Button>
+            {equipment.availableQuantity > 0 && (
+              <Link href={`/issue`}>
+                <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs">
+                  Issue Gear
+                </Button>
+              </Link>
+            )}
           </div>
-        </CardContent>
-      </Card>
-
+        }
+      />
       {/* Tabs */}
       <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
         <CardHeader>
@@ -179,10 +168,12 @@ export default function EquipmentDetailClient({ equipment, userRole }: Equipment
           {activeTab === 'history' && (
             <div className="space-y-4">
               {equipment.movements.length === 0 ? (
-                <div className="text-center py-8">
-                  <History className="h-12 w-12 text-slate-400 mx-auto mb-3" />
-                  <p className="text-slate-600 dark:text-slate-400">No movement history</p>
-                </div>
+                <EmptyState
+                  icon={History}
+                  title="No Movement History"
+                  description="This item has not been issued, returned, or transferred yet."
+                  className="py-12"
+                />
               ) : (
                 <div className="relative">
                   {/* Timeline line */}

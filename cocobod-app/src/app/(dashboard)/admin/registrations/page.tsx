@@ -7,8 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Search, Filter, CheckCircle, XCircle, Clock, Download } from 'lucide-react';
+import { useToast } from '@/components/ui/toast';
 
 export default function RegistrationsPage() {
+  const { toast } = useToast();
   const [registrations, setRegistrations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -126,14 +128,14 @@ export default function RegistrationsPage() {
         setShowPreRegisterModal(false);
         setPreRegisterForm({ full_name: '', organisation: '', position: '', phone: '' });
         fetchRegistrations();
-        alert(`Pre-registered!\n\nName: ${displayName}\nCode: ${data.registration_code}`);
+        toast.success(`Pre-registered successfully!\nName: ${displayName} | Code: ${data.registration_code}`);
       } else {
         const error = await response.json();
-        alert(error.error || 'Failed to pre-register');
+        toast.error(error.error || 'Failed to pre-register');
       }
     } catch (error) {
       console.error('Error pre-registering:', error);
-      alert('An error occurred while pre-registering');
+      toast.error('An error occurred while pre-registering');
     } finally {
       setPreRegistering(false);
     }

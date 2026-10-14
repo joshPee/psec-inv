@@ -24,8 +24,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Plus, Search, ShieldAlert, Lock, ArrowRight } from 'lucide-react'
+import { Plus, Search, ShieldAlert, Lock, ArrowRight, Package } from 'lucide-react'
 import { useToast } from '@/components/ui/toast'
+import { PageHeader } from '@/components/ui/page-header'
+import { EmptyState } from '@/components/ui/empty-state'
 
 import { Suspense } from 'react'
 
@@ -203,23 +205,15 @@ function IssueEquipmentContent() {
 
   return (
     <div className="space-y-6">
-      {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-emerald-950 to-slate-900 border border-slate-800 p-6 sm:p-8 text-white shadow-xl">
-        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 30% 50%, rgba(16, 185, 129, 0.3) 0%, transparent 60%), radial-gradient(circle at 70% 50%, rgba(52, 211, 153, 0.2) 0%, transparent 60%)' }} />
-        <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/30 text-emerald-200 border border-emerald-400/30">
-                Equipment Distribution
-              </span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight flex items-center gap-3">
-              <ArrowRight className="h-7 w-7 text-emerald-400" />
-              Issue Equipment
-            </h1>
-            <p className="text-sm text-slate-300 mt-1">View and manage equipment issued to staff</p>
-          </div>
-          {(userRole === 'EQUIPMENT_CUSTODIAN' || userRole === 'SECURITY_SUPERVISOR' || userRole === null) ? (
+      {/* Modern Page Header */}
+      <PageHeader
+        icon={ArrowRight}
+        title="Issue Equipment"
+        subtitle="Manage and authorize equipment distribution to security staff and duty posts."
+        badge="Equipment Distribution"
+        color="emerald"
+        actions={
+          (userRole === 'EQUIPMENT_CUSTODIAN' || userRole === 'SECURITY_SUPERVISOR' || userRole === null) ? (
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
                 <Button className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium shadow-sm">
@@ -344,15 +338,15 @@ function IssueEquipmentContent() {
               </DialogContent>
             </Dialog>
           ) : userRole ? (
-            <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800">
-              <Lock className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-              <span className="text-sm text-amber-800 dark:text-amber-300 font-medium">
+            <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20 backdrop-blur-md">
+              <Lock className="h-4 w-4 text-amber-400" />
+              <span className="text-xs text-amber-200 font-medium">
                 Read-only view - Only Custodians and Supervisors can issue equipment
               </span>
             </div>
-          ) : null}
-        </div>
-      </div>
+          ) : null
+        }
+      />
 
       {/* Search */}
       <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
@@ -393,8 +387,12 @@ function IssueEquipmentContent() {
               <tbody>
                 {filteredItems.length === 0 ? (
                   <tr>
-                    <td colSpan={9} className="py-8 text-center text-slate-500 dark:text-slate-400">
-                      No issued equipment found
+                    <td colSpan={9} className="p-8">
+                      <EmptyState
+                        icon={Package}
+                        title="No Issued Equipment Found"
+                        description="No matching equipment dispatch records found."
+                      />
                     </td>
                   </tr>
                 ) : (

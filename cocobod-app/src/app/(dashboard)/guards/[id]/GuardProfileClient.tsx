@@ -26,7 +26,8 @@ import {
   Ban,
   ChevronRight,
   Upload,
-  Camera
+  Camera,
+  Trash2
 } from 'lucide-react'
 import {
   Dialog,
@@ -36,6 +37,10 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog'
+import { Breadcrumb } from '@/components/ui/breadcrumb'
+import { PageHeader } from '@/components/ui/page-header'
+import { EmptyState } from '@/components/ui/empty-state'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 
 interface GuardProfileClientProps {
   guard: any
@@ -48,6 +53,7 @@ export default function GuardProfileClient({ guard, userRole }: GuardProfileClie
   const isSupervisor = userRole === 'SECURITY_SUPERVISOR'
   const [activeTab, setActiveTab] = useState<'holdings' | 'bookings' | 'damaged' | 'missing'>('holdings')
   const [isDeactivateDialogOpen, setIsDeactivateDialogOpen] = useState(false)
+  const [isDeletePhotoConfirmOpen, setIsDeletePhotoConfirmOpen] = useState(false)
   const [isPhotoDialogOpen, setIsPhotoDialogOpen] = useState(false)
   const [photoFile, setPhotoFile] = useState<File | null>(null)
   const [photoPreview, setPhotoPreview] = useState<string | null>(null)
@@ -57,6 +63,12 @@ export default function GuardProfileClient({ guard, userRole }: GuardProfileClie
   const pastIssues = guard.issues.filter((i: any) => i.status !== 'ISSUED')
   const pendingBookings = guard.bookings.filter((b: any) => b.status === 'PENDING')
   const approvedBookings = guard.bookings.filter((b: any) => b.status === 'APPROVED')
+
+  const totalOutstandingUnits = activeIssues.reduce(
+    (acc: number, issue: any) =>
+      acc + issue.items.reduce((s: number, it: any) => s + (it.quantityOutstanding || 0), 0),
+    0
+  )
 
   const handleDeactivate = async () => {
     try {
@@ -152,15 +164,62 @@ export default function GuardProfileClient({ guard, userRole }: GuardProfileClie
 
   return (
     <div className="space-y-6">
-      {/* Back Button */}
-      <Button
-        variant="ghost"
-        onClick={() => router.push('/guards')}
-        className="mb-4"
-      >
-        <ArrowLeft className="h-4 w-4 mr-2" />
-        Back to Guards
-      </Button>
+      {/* Modern Breadcrumb */}
+      <Breadcrumb
+        items={[
+          { label: 'Guards', href: '/guards' },
+          { label: guard.fullName },
+        ]}
+      />
+
+      {/* Contextual Hero Header */}
+      <PageHeader
+        icon={Shield}
+        badge={`Badge: ${guard.badgeId} • ${guard.status}`}
+        title={guard.fullName}
+        subtitle={`Staff ID: ${guard.staffId || 'N/A'} • Team: ${guard.team || 'General Post'} • Shift: ${guard.shift || 'Rotational'}`}
+        color="emerald"
+        stats={[
+          { label: 'Active Gear Units', value: totalOutstandingUnits, highlight: totalOutstandingUnits > 0 },
+          { label: 'Total Bookings', value: guard.bookings.length },
+          { label: 'Damage Incidents', value: guard.damaged.length, highlight: guard.damaged.length > 0 },
+          { label: 'Missing Assets', value: guard.missing.length, highlight: guard.missing.length > 0 },
+        ]}
+        actions={
+          <div className="flex items-center gap-2">
+            <Button
+              variant="secondary"
+              onClick={() => router.push('/guards')}
+              className="bg-white/10 hover:bg-white/20 text-white border border-white/10 text-xs"
+            >
+              <ArrowLeft className="h-4 w-4 mr-1.5" />
+              All Guards
+            </Button>
+            {isSupervisor && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsPhotoDialogOpen(true)}
+                className="bg-white/10 hover:bg-white/20 text-white border border-white/20 text-xs"
+              >
+                <Camera className="h-3.5 w-3.5 mr-1.5" />
+                {guard.photoUrl ? 'Update Photo' : 'Add Photo'}
+              </Button>
+            )}
+            {isSupervisor && guard.status === 'ACTIVE' && (
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => setIsDeactivateDialogOpen(true)}
+                className="bg-rose-600/80 hover:bg-rose-600 text-white text-xs"
+              >
+                <Ban className="h-3.5 w-3.5 mr-1.5" />
+                Deactivate
+              </Button>
+            )}
+          </div>
+        }
+      />
 
       {/* Profile Header */}
       <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
@@ -356,10 +415,12 @@ export default function GuardProfileClient({ guard, userRole }: GuardProfileClie
           {activeTab === 'holdings' && (
             <div className="space-y-4">
               {activeIssues.length === 0 ? (
-                <div className="text-center py-8">
-                  <CheckCircle className="h-12 w-12 text-emerald-500 mx-auto mb-3" />
-                  <p className="text-slate-600 dark:text-slate-400">No active equipment holdings</p>
-                </div>
+                <EmptyState
+                  icon={Package}
+                  title="No Active Equipment Holdings"
+                  description={`${guard.fullName} currently has no active issued equipment.`}
+                  className="py-12"
+                />
               ) : (
                 activeIssues.map((issue: any) => (
                   <Card key={issue.id} className="border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
@@ -412,10 +473,12 @@ export default function GuardProfileClient({ guard, userRole }: GuardProfileClie
           {activeTab === 'bookings' && (
             <div className="space-y-4">
               {guard.bookings.length === 0 ? (
-                <div className="text-center py-8">
-                  <Calendar className="h-12 w-12 text-slate-400 mx-auto mb-3" />
-                  <p className="text-slate-600 dark:text-slate-400">No booking history</p>
-                </div>
+                <EmptyState
+                  icon={Calendar}
+                  title="No Booking History"
+                  description="No reservation requests have been made for this guard."
+                  className="py-12"
+                />
               ) : (
                 guard.bookings.map((booking: any) => (
                   <Card key={booking.id} className="border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
@@ -463,10 +526,12 @@ export default function GuardProfileClient({ guard, userRole }: GuardProfileClie
           {activeTab === 'damaged' && (
             <div className="space-y-4">
               {guard.damaged.length === 0 ? (
-                <div className="text-center py-8">
-                  <CheckCircle className="h-12 w-12 text-emerald-500 mx-auto mb-3" />
-                  <p className="text-slate-600 dark:text-slate-400">No damaged records</p>
-                </div>
+                <EmptyState
+                  icon={CheckCircle}
+                  title="No Damaged Records"
+                  description="No damaged equipment records have been filed for this guard."
+                  className="py-12"
+                />
               ) : (
                 guard.damaged.map((record: any) => (
                   <Card key={record.id} className="border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
@@ -512,10 +577,12 @@ export default function GuardProfileClient({ guard, userRole }: GuardProfileClie
           {activeTab === 'missing' && (
             <div className="space-y-4">
               {guard.missing.length === 0 ? (
-                <div className="text-center py-8">
-                  <CheckCircle className="h-12 w-12 text-emerald-500 mx-auto mb-3" />
-                  <p className="text-slate-600 dark:text-slate-400">No missing records</p>
-                </div>
+                <EmptyState
+                  icon={CheckCircle}
+                  title="No Missing Records"
+                  description="No missing equipment reports have been filed for this guard."
+                  className="py-12"
+                />
               ) : (
                 guard.missing.map((record: any) => (
                   <Card key={record.id} className="border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
@@ -589,11 +656,13 @@ export default function GuardProfileClient({ guard, userRole }: GuardProfileClie
                 />
                 {guard.photoUrl && (
                   <Button
+                    type="button"
                     variant="outline"
                     size="sm"
-                    onClick={handlePhotoDelete}
+                    onClick={() => setIsDeletePhotoConfirmOpen(true)}
                     className="mt-2 text-rose-600 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-900/30"
                   >
+                    <Trash2 className="h-3.5 w-3.5 mr-1.5" />
                     Remove Current Photo
                   </Button>
                 )}
@@ -619,25 +688,32 @@ export default function GuardProfileClient({ guard, userRole }: GuardProfileClie
         </DialogContent>
       </Dialog>
 
-      {/* Deactivate Dialog */}
-      <Dialog open={isDeactivateDialogOpen} onOpenChange={setIsDeactivateDialogOpen}>
-        <DialogContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
-          <DialogHeader>
-            <DialogTitle className="text-slate-900 dark:text-white">Deactivate Guard</DialogTitle>
-            <DialogDescription className="text-slate-500 dark:text-slate-400">
-              Are you sure you want to deactivate {guard.fullName}? This will prevent them from accessing the system and creating new bookings.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDeactivateDialogOpen(false)} className="dark:border-slate-700">
-              Cancel
-            </Button>
-            <Button onClick={handleDeactivate} variant="destructive">
-              Deactivate
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Confirm Photo Removal Dialog */}
+      <ConfirmDialog
+        open={isDeletePhotoConfirmOpen}
+        onOpenChange={setIsDeletePhotoConfirmOpen}
+        title="Remove Guard Photo"
+        description={`Are you sure you want to remove the profile photo for ${guard.fullName}? This action cannot be undone.`}
+        confirmLabel="Remove Photo"
+        variant="destructive"
+        icon={Trash2}
+        onConfirm={async () => {
+          await handlePhotoDelete()
+          setIsDeletePhotoConfirmOpen(false)
+        }}
+      />
+
+      {/* Confirm Deactivate Guard Dialog */}
+      <ConfirmDialog
+        open={isDeactivateDialogOpen}
+        onOpenChange={setIsDeactivateDialogOpen}
+        title="Deactivate Guard"
+        description={`Are you sure you want to deactivate ${guard.fullName}? This will suspend their portal access and prevent new equipment checkout or bookings.`}
+        confirmLabel="Deactivate Guard"
+        variant="destructive"
+        icon={Ban}
+        onConfirm={handleDeactivate}
+      />
     </div>
   )
 }

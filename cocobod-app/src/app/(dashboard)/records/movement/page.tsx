@@ -1,100 +1,107 @@
 import { prisma } from '@/lib/prisma'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
 import { StatusBadge } from '@/components/ui/status-badge'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, History, ChevronLeft, ChevronRight } from 'lucide-react'
+import { PageHeader } from '@/components/ui/page-header'
+import { EmptyState } from '@/components/ui/empty-state'
+import { Button } from '@/components/ui/button'
 
-async function getMovementHistory(custodianId?: string) {
+const PAGE_SIZE = 20
+
+async function getMovementHistory(custodianId?: string, page: number = 1) {
   const where = custodianId ? { movedById: custodianId } : {}
   
-  return await prisma.equipmentMovement.findMany({
-    where,
-    orderBy: { createdAt: 'desc' },
-    take: 50,
-    include: {
-      equipment: true,
-      movedBy: true,
-      guard: true,
-    },
-  })
+  const [total, movements] = await Promise.all([
+    prisma.equipmentMovement.count({ where }),
+    prisma.equipmentMovement.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
+      include: {
+        equipment: true,
+        movedBy: true,
+        guard: true,
+      },
+    }),
+  ])
+
+  return { movements, total }
 }
 
 export default async function MovementHistoryPage({
   searchParams,
 }: {
-  searchParams: { custodian?: string }
+  searchParams: Promise<{ custodian?: string; page?: string }>
 }) {
+  const params = await searchParams
+  const currentPage = Math.max(1, parseInt(params.page || '1', 10) || 1)
   const session = await getServerSession(authOptions)
   const isSupervisor = session?.user?.role === 'SECURITY_SUPERVISOR'
-  const movements = await getMovementHistory(searchParams.custodian)
+  const { movements, total } = await getMovementHistory(params.custodian, currentPage)
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
   
   // Get custodian info if filtering
   let custodianInfo = null
-  if (searchParams.custodian) {
+  if (params.custodian) {
     custodianInfo = await prisma.user.findUnique({
-      where: { id: searchParams.custodian },
+      where: { id: params.custodian },
       select: { fullName: true, staffId: true }
     })
   }
 
+  const buildPageUrl = (pageNumber: number) => {
+    const sp = new URLSearchParams()
+    if (params.custodian) sp.set('custodian', params.custodian)
+    sp.set('page', String(pageNumber))
+    return `/records/movement?${sp.toString()}`
+  }
+
   return (
     <div className="space-y-6">
-      {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-slate-800 p-6 md:p-8 text-white shadow-xl">
-        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 30% 50%, rgba(99, 102, 241, 0.3) 0%, transparent 60%), radial-gradient(circle at 70% 50%, rgba(129, 140, 248, 0.2) 0%, transparent 60%)' }} />
-        <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-500/30 text-indigo-200 border border-indigo-400/30">
-                {isSupervisor ? 'Audit Trail' : 'Transaction Log'}
-              </span>
-            </div>
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-3">
-              {custodianInfo 
-                ? `Movement History: ${custodianInfo.fullName}`
-                : (isSupervisor ? 'Audit Trail: Equipment Movements' : 'Movement History')
-              }
-            </h1>
-            <p className="text-sm text-slate-300 mt-1">
-              {custodianInfo 
-                ? `Staff ID: ${custodianInfo.staffId} • All transactions processed by this custodian`
-                : (isSupervisor 
-                  ? 'Supervisory oversight of all equipment movements' 
-                  : 'Track all equipment movements')
-              }
-            </p>
-          </div>
-          {custodianInfo && (
+      {/* Modern Page Header */}
+      <PageHeader
+        icon={History}
+        title={custodianInfo 
+          ? `Movement History: ${custodianInfo.fullName}`
+          : (isSupervisor ? 'Audit Trail: Equipment Movements' : 'Movement History')}
+        subtitle={custodianInfo 
+          ? `Staff ID: ${custodianInfo.staffId} • All transaction records processed by this custodian`
+          : (isSupervisor 
+            ? 'Supervisory oversight of all check-outs, transfers, and security asset movements' 
+            : 'Complete audit log tracking equipment issues, returns, and custody changes')}
+        badge={isSupervisor ? 'Supervisory Audit' : 'Transaction Log'}
+        color="indigo"
+        stats={[
+          { label: 'Total Events', value: total },
+          { label: 'Page', value: `${currentPage} of ${totalPages}` },
+        ]}
+        actions={
+          custodianInfo ? (
             <Link href="/dashboard">
               <Button variant="secondary" className="bg-white/10 hover:bg-white/20 text-white border border-white/10 text-xs">
                 <ArrowLeft className="h-4 w-4 mr-1.5" />
                 Back to Dashboard
               </Button>
             </Link>
-          )}
-        </div>
-      </div>
-
-      <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
-        <CardContent className="pt-6">
-          <div className="flex gap-3">
-            <Input
-              placeholder="Search movements..."
-              className="max-w-full sm:max-w-sm border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-            />
-          </div>
-        </CardContent>
-      </Card>
+          ) : undefined
+        }
+      />
 
       <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
         <CardHeader>
-          <CardTitle className="text-lg font-semibold text-slate-900 dark:text-white">
-            {isSupervisor ? 'Audit Log' : 'Movement History'}
-          </CardTitle>
+          <div className="flex justify-between items-center">
+            <CardTitle className="text-lg font-semibold text-slate-900 dark:text-white">
+              {isSupervisor ? 'Audit Log' : 'Movement History'}
+            </CardTitle>
+            <span className="text-xs text-slate-500 dark:text-slate-400">
+              Showing {movements.length > 0 ? (currentPage - 1) * PAGE_SIZE + 1 : 0} to{' '}
+              {Math.min(currentPage * PAGE_SIZE, total)} of {total} records
+            </span>
+          </div>
         </CardHeader>
         <CardContent className="p-0">
           <div className="overflow-x-auto">
@@ -115,14 +122,22 @@ export default async function MovementHistoryPage({
               <tbody>
                 {movements.length === 0 ? (
                   <tr>
-                    <td colSpan={9} className="py-8 text-center text-slate-500 dark:text-slate-400">
-                      No movement history found
+                    <td colSpan={9} className="p-8">
+                      <EmptyState
+                        icon={History}
+                        title="No Movement Records"
+                        description={
+                          custodianInfo
+                            ? `No transaction records found for ${custodianInfo.fullName}.`
+                            : 'No equipment checkout or return logs found.'
+                        }
+                      />
                     </td>
                   </tr>
                 ) : (
                   movements.map((movement) => (
                     <tr key={movement.id} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                      <td className="py-3 px-4 text-slate-600 dark:text-slate-400">
+                      <td className="py-3 px-4 text-slate-600 dark:text-slate-400 whitespace-nowrap text-xs">
                         {new Date(movement.createdAt).toLocaleString()}
                       </td>
                       <td className="py-3 px-4">
@@ -134,15 +149,55 @@ export default async function MovementHistoryPage({
                       <td className="py-3 px-4 text-slate-900 dark:text-white font-semibold">{movement.quantity}</td>
                       <td className="py-3 px-4 text-slate-600 dark:text-slate-400">{movement.condition || '-'}</td>
                       <td className="py-3 px-4 text-slate-600 dark:text-slate-400">{movement.dutyPoint || '-'}</td>
-                      <td className="py-3 px-4 text-slate-600 dark:text-slate-400">{movement.remarks || '-'}</td>
+                      <td className="py-3 px-4 text-slate-600 dark:text-slate-400 text-xs">{movement.remarks || '-'}</td>
                     </tr>
                   ))
                 )}
               </tbody>
             </table>
           </div>
+
+          {/* Server-Side Pagination Bar */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between px-4 py-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Page <span className="font-semibold text-slate-900 dark:text-white">{currentPage}</span> of{' '}
+                <span className="font-semibold text-slate-900 dark:text-white">{totalPages}</span>
+              </p>
+              <div className="flex items-center gap-2">
+                {currentPage > 1 ? (
+                  <Link href={buildPageUrl(currentPage - 1)}>
+                    <Button variant="outline" size="sm" className="h-8 px-2 text-xs border-slate-200 dark:border-slate-700">
+                      <ChevronLeft className="h-3.5 w-3.5 mr-1" />
+                      Previous
+                    </Button>
+                  </Link>
+                ) : (
+                  <Button variant="outline" size="sm" disabled className="h-8 px-2 text-xs border-slate-200 dark:border-slate-700">
+                    <ChevronLeft className="h-3.5 w-3.5 mr-1" />
+                    Previous
+                  </Button>
+                )}
+
+                {currentPage < totalPages ? (
+                  <Link href={buildPageUrl(currentPage + 1)}>
+                    <Button variant="outline" size="sm" className="h-8 px-2 text-xs border-slate-200 dark:border-slate-700">
+                      Next
+                      <ChevronRight className="h-3.5 w-3.5 ml-1" />
+                    </Button>
+                  </Link>
+                ) : (
+                  <Button variant="outline" size="sm" disabled className="h-8 px-2 text-xs border-slate-200 dark:border-slate-700">
+                    Next
+                    <ChevronRight className="h-3.5 w-3.5 ml-1" />
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
   )
 }
+

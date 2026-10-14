@@ -21,8 +21,10 @@ import {
   ChevronRight,
   UserCheck,
   UserCog,
+  ShieldCheck,
   AlertTriangle
 } from 'lucide-react'
+import { PageHeader } from '@/components/ui/page-header'
 
 async function getCustodianActivity() {
   const today = new Date()
@@ -463,14 +465,25 @@ export default async function DashboardPage() {
         </Card>
       )}
 
-      {/* Header - Supervisor Only */}
-      {isSupervisor && (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Supervisor Overview</h1>
-          </div>
-        </div>
-      )}
+      {/* Dashboard Page Hero — Live Command Center */}
+      <PageHeader
+        icon={isSupervisor ? UserCog : ShieldCheck}
+        badge={isSupervisor ? "Supervisor Command Center" : "Armory Operations Hub"}
+        title={isSupervisor ? "Supervisor Overview" : "Armory Command & Dispatch"}
+        description={
+          isSupervisor
+            ? "Real-time operational command center — monitor equipment, personnel, and inventory status."
+            : "Live inventory overview, asset checkout tracking, and guard reservation operations."
+        }
+        color={isSupervisor ? "indigo" : "emerald"}
+        livePulse
+        stats={[
+          { label: 'Total Equipment', value: stats.kpis.totalItems },
+          { label: 'Active Issued', value: stats.kpis.activeIssuedUnits },
+          { label: 'Guards On Duty', value: stats.totalGuards },
+          { label: 'Pending Bookings', value: stats.formula.pendingBookings, highlight: stats.formula.pendingBookings > 0 },
+        ]}
+      />
 
       {/* Custodian Operations Hub Card (Ultra-Modern Command Center) */}
       <CustodianHubCard

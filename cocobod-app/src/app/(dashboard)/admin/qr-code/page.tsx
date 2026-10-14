@@ -5,8 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Download, Share2, Image as ImageIcon, RefreshCw } from 'lucide-react';
 import QRCode from 'qrcode';
+import { useToast } from '@/components/ui/toast';
 
 export default function QRCodePage() {
+  const { toast } = useToast();
   const [qrCodeUrl, setQrCodeUrl] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -66,9 +68,8 @@ export default function QRCodePage() {
         console.error('Error sharing:', err);
       }
     } else {
-      // Fallback: copy to clipboard
       navigator.clipboard.writeText(url);
-      alert('PDF URL copied to clipboard!');
+      toast.success('PDF URL copied to clipboard!');
     }
   };
 

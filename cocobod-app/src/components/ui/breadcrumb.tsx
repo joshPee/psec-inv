@@ -5,26 +5,38 @@ import { usePathname } from 'next/navigation';
 import { ChevronRight, Home } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-interface BreadcrumbItem {
+export interface BreadcrumbItem {
   label: string;
   href?: string;
 }
 
-export function Breadcrumb() {
+interface BreadcrumbProps {
+  items?: BreadcrumbItem[];
+  className?: string;
+}
+
+export function Breadcrumb({ items, className }: BreadcrumbProps) {
   const pathname = usePathname();
 
   const getBreadcrumbs = (): BreadcrumbItem[] => {
-    if (pathname === '/admin/dashboard') {
-      return [{ label: 'Dashboard', href: '/admin/dashboard' }];
+    if (items && items.length > 0) {
+      return items;
+    }
+
+    const isAdmin = pathname.startsWith('/admin');
+    const homeHref = isAdmin ? '/admin/dashboard' : '/dashboard';
+
+    if (pathname === homeHref) {
+      return [{ label: 'Dashboard', href: homeHref }];
     }
 
     const segments = pathname.split('/').filter(Boolean);
     const breadcrumbs: BreadcrumbItem[] = [
-      { label: 'Dashboard', href: '/admin/dashboard' }
+      { label: 'Dashboard', href: homeHref }
     ];
 
     segments.forEach((segment, index) => {
-      if (segment === 'admin') return;
+      if (segment === 'admin' && isAdmin) return;
       
       const href = '/' + segments.slice(0, index + 1).join('/');
       const label = segment
@@ -40,36 +52,42 @@ export function Breadcrumb() {
 
   const breadcrumbs = getBreadcrumbs();
 
-  if (pathname === '/admin/login') {
+  if (pathname === '/admin/login' || pathname === '/login') {
     return null;
   }
 
+  const rootHref = pathname.startsWith('/admin') ? '/admin/dashboard' : '/dashboard';
+
   return (
-    <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
+    <nav aria-label="Breadcrumb" className={cn("flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 mb-4", className)}>
       <Link
-        href="/admin/dashboard"
-        className="hover:text-foreground transition-colors"
+        href={rootHref}
+        className="flex items-center gap-1 hover:text-slate-900 dark:hover:text-white transition-colors py-1 px-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800"
+        title="Dashboard"
       >
-        <Home className="h-4 w-4" />
+        <Home className="h-3.5 w-3.5" />
       </Link>
-      {breadcrumbs.slice(1).map((item, index) => (
-        <div key={item.href} className="flex items-center gap-2">
-          <ChevronRight className="h-4 w-4 shrink-0" />
-          {item.href ? (
-            <Link
-              href={item.href}
-              className={cn(
-                "hover:text-foreground transition-colors",
-                index === breadcrumbs.length - 2 && "text-foreground font-medium"
-              )}
-            >
-              {item.label}
-            </Link>
-          ) : (
-            <span className="text-foreground font-medium">{item.label}</span>
-          )}
-        </div>
-      ))}
+      {breadcrumbs.map((item, index) => {
+        const isLast = index === breadcrumbs.length - 1;
+        return (
+          <div key={item.href || item.label + index} className="flex items-center gap-1.5">
+            <ChevronRight className="h-3.5 w-3.5 text-slate-400 dark:text-slate-600 shrink-0" />
+            {item.href && !isLast ? (
+              <Link
+                href={item.href}
+                className="hover:text-slate-900 dark:hover:text-white transition-colors py-1 px-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800"
+              >
+                {item.label}
+              </Link>
+            ) : (
+              <span className="font-semibold text-slate-800 dark:text-slate-200 py-1 px-1.5 truncate max-w-[240px]">
+                {item.label}
+              </span>
+            )}
+          </div>
+        );
+      })}
     </nav>
   );
 }
+

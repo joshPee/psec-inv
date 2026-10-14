@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { AlertTriangle, Plus, Search, Trash2, Edit, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { PageHeader } from '@/components/ui/page-header';
 
 export default function IncidentsPage() {
   const [incidents, setIncidents] = useState<any[]>([]);
@@ -154,20 +155,29 @@ export default function IncidentsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Incidents</h1>
-        <Button
-          onClick={() => setShowForm(!showForm)}
-          className="bg-[#123B70] hover:bg-[#0d2d52]"
-        >
-          {showForm ? 'Cancel' : (
-            <>
-              <Plus className="h-4 w-4 mr-2" />
-              Report Incident
-            </>
-          )}
-        </Button>
-      </div>
+      <PageHeader
+        icon={AlertTriangle}
+        badge="Security Operations"
+        title="Incident Reports"
+        description="Log, track, and manage security incidents reported by officers on duty."
+        color="amber"
+        stats={[
+          { label: 'Total Incidents', value: incidents.length },
+        ]}
+        actions={
+          <Button
+            onClick={() => setShowForm(!showForm)}
+            className="bg-amber-600 hover:bg-amber-700 text-white font-medium shadow-sm"
+          >
+            {showForm ? 'Cancel' : (
+              <>
+                <Plus className="h-4 w-4 mr-2" />
+                Report Incident
+              </>
+            )}
+          </Button>
+        }
+      />
 
       {message && (
         <div className={`px-3 py-2 rounded-lg flex items-start gap-2 text-sm ${

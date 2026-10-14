@@ -6,8 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { ScrollText, Search, RefreshCw, CheckCircle, XCircle, LogIn, LogOut, UserCheck, Edit, Download, Calendar } from 'lucide-react';
+import { useToast } from '@/components/ui/toast';
 
 export default function AuditLogPage() {
+  const { toast } = useToast();
   const [logs, setLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -99,7 +101,7 @@ export default function AuditLogPage() {
       const data = await response.json();
       
       if (!Array.isArray(data) || data.length === 0) {
-        alert('No data to export for the selected date range');
+        toast.error('No data to export for the selected date range');
         return;
       }
 
@@ -128,7 +130,7 @@ export default function AuditLogPage() {
       URL.revokeObjectURL(url2);
     } catch (error) {
       console.error('Error exporting logs:', error);
-      alert('Failed to export logs');
+      toast.error('Failed to export logs');
     }
   };
 

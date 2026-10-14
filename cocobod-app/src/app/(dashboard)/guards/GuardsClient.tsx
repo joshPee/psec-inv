@@ -23,6 +23,8 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useToast } from '@/components/ui/toast'
+import { EmptyState } from '@/components/ui/empty-state'
+import { PageHeader } from '@/components/ui/page-header'
 import {
   Shield,
   Package,
@@ -233,53 +235,39 @@ export default function GuardsClient({ guards: initialGuards, userRole }: Guards
 
   return (
     <div className="space-y-6">
-      {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-700 via-slate-800 to-slate-900 p-6 md:p-8 text-white shadow-lg">
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md text-slate-200 text-xs font-semibold mb-3 border border-white/20">
-              <Shield className="h-3.5 w-3.5" />
-              <span>Guard Registry</span>
+      {/* Modern Page Header */}
+      <PageHeader
+        icon={Shield}
+        title="Guards Portal"
+        subtitle="Track duty points, deployment shifts, biometric credentials, and security equipment held by officers."
+        badge="Guard Force Registry"
+        color="slate"
+        stats={[
+          { label: 'Active Guards', value: totalGuards },
+          { label: 'Holding Gear', value: guardsWithGear, highlight: true },
+        ]}
+        actions={
+          isSupervisor ? (
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={() => setIsAddDialogOpen(true)}
+                className="bg-emerald-600 hover:bg-emerald-500 text-white font-medium shadow-md flex items-center gap-2 transition-all"
+              >
+                <Plus className="h-4 w-4" />
+                Add Guard
+              </Button>
+              <Button
+                onClick={() => router.push('/guards/import')}
+                variant="outline"
+                className="bg-white/10 hover:bg-white/20 text-white border-white/20 font-medium shadow-sm flex items-center gap-2 transition-all"
+              >
+                <Upload className="h-4 w-4" />
+                Import CSV
+              </Button>
             </div>
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white">Guards Portal</h1>
-            <p className="mt-1 text-sm text-slate-300 max-w-xl">
-              Track duty points, shifts, and equipment held by each security guard.
-            </p>
-          </div>
-          {/* KPIs */}
-          <div className="flex gap-4">
-            <div className="text-center px-4 py-2 rounded-xl bg-white/10 backdrop-blur-sm border border-white/10">
-              <p className="text-2xl font-bold">{totalGuards}</p>
-              <p className="text-xs text-slate-300 mt-0.5">Active Guards</p>
-            </div>
-            <div className="text-center px-4 py-2 rounded-xl bg-white/10 backdrop-blur-sm border border-white/10">
-              <p className="text-2xl font-bold text-emerald-300">{guardsWithGear}</p>
-              <p className="text-xs text-slate-300 mt-0.5">Holding Gear</p>
-            </div>
-          </div>
-          {isSupervisor && (
-            <Button
-              onClick={() => setIsAddDialogOpen(true)}
-              className="bg-emerald-500 hover:bg-emerald-400 text-white font-semibold shadow-md flex items-center gap-2 shrink-0"
-            >
-              <Plus className="h-4 w-4" />
-              Add Guard
-            </Button>
-          )}
-          {isSupervisor && (
-            <Button
-              onClick={() => router.push('/guards/import')}
-              variant="outline"
-              className="border-emerald-500 text-emerald-600 hover:bg-emerald-50 dark:border-emerald-600 dark:text-emerald-400 dark:hover:bg-emerald-950/30 font-semibold shadow-md flex items-center gap-2 shrink-0"
-            >
-              <Upload className="h-4 w-4" />
-              Import CSV
-            </Button>
-          )}
-        </div>
-        <div className="absolute -top-20 -right-20 w-80 h-80 bg-white/5 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-slate-900/30 rounded-full blur-3xl pointer-events-none" />
-      </div>
+          ) : undefined
+        }
+      />
 
       {/* Search */}
       <div className="relative">
@@ -295,15 +283,12 @@ export default function GuardsClient({ guards: initialGuards, userRole }: Guards
       {/* Mobile Card View */}
       <div className="lg:hidden space-y-3">
         {filteredGuards.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="inline-flex p-4 rounded-full bg-slate-100 dark:bg-slate-800 mb-3">
-              <Users className="h-7 w-7 text-slate-400" />
-            </div>
-            <p className="font-semibold text-slate-700 dark:text-slate-300">No guards found</p>
-            <p className="text-xs text-slate-500 mt-1">
-              {searchQuery ? 'Try a different search term.' : 'No active guards are registered.'}
-            </p>
-          </div>
+          <EmptyState
+            icon={Users}
+            title="No Guards Found"
+            description={searchQuery ? 'Try a different search query or filter.' : 'No active security guards are registered.'}
+            className="py-12"
+          />
         ) : (
           paginatedGuards.map(guard => {
             const activeIssue = guard.issues.find(i => i.status === 'ISSUED')
@@ -401,14 +386,12 @@ export default function GuardsClient({ guards: initialGuards, userRole }: Guards
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
               {filteredGuards.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-16 text-center">
-                    <div className="inline-flex p-4 rounded-full bg-slate-100 dark:bg-slate-800 mb-3">
-                      <Users className="h-7 w-7 text-slate-400" />
-                    </div>
-                    <p className="font-semibold text-slate-700 dark:text-slate-300">No guards found</p>
-                    <p className="text-xs text-slate-500 mt-1">
-                      {searchQuery ? 'Try a different search term.' : 'No active guards are registered.'}
-                    </p>
+                  <td colSpan={7} className="py-12 text-center">
+                    <EmptyState
+                      icon={Users}
+                      title="No Guards Found"
+                      description={searchQuery ? 'Try a different search query or filter.' : 'No active security guards are registered.'}
+                    />
                   </td>
                 </tr>
               ) : (

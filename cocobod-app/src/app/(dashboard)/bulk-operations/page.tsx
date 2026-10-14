@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Combobox } from '@/components/ui/combobox'
 import { Plus, Trash2, Package, ArrowRight, Layers, CheckCircle2, AlertCircle } from 'lucide-react'
 import { useToast } from '@/components/ui/toast'
+import { PageHeader } from '@/components/ui/page-header'
 
 export default function BulkOperationsPage() {
   const { toast } = useToast()
@@ -201,37 +202,37 @@ export default function BulkOperationsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Hero Header */}
-      <div className={`relative overflow-hidden rounded-2xl p-6 md:p-8 text-white shadow-lg transition-all duration-500 ${
-        activeTab === 'issue'
-          ? 'bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-700'
-          : 'bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-700'
-      }`}>
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md text-white text-xs font-semibold mb-3 border border-white/20">
-              <Layers className="h-3.5 w-3.5" />
-              <span>Batch Operations Hub</span>
-            </div>
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white">
-              {activeTab === 'issue' ? 'Bulk Equipment Issuance' : 'Bulk Equipment Return'}
-            </h1>
-            <p className="mt-1 text-sm md:text-base text-white/90 max-w-xl">
-              {activeTab === 'issue'
-                ? 'Assign multiple security equipment items to a single security personnel in one streamlined batch.'
-                : 'Reconcile and accept multiple outstanding equipment items simultaneously back into inventory.'}
-            </p>
-          </div>
-
-          {/* Mode Switcher Tabs */}
-          <div className="flex bg-black/20 backdrop-blur-md p-1.5 rounded-xl border border-white/20">
+      {/* Modern Hero Header */}
+      <PageHeader
+        icon={Layers}
+        badge="Batch Operations Hub"
+        title={activeTab === 'issue' ? 'Bulk Equipment Issuance' : 'Bulk Equipment Return'}
+        description={
+          activeTab === 'issue'
+            ? 'Assign multiple security equipment items to a single security personnel in one streamlined batch.'
+            : 'Reconcile and accept multiple outstanding equipment items simultaneously back into inventory.'
+        }
+        color={activeTab === 'issue' ? 'emerald' : 'blue'}
+        stats={
+          activeTab === 'issue'
+            ? [
+                { label: 'Items Queued', value: issueItems.length },
+                { label: 'Personnel Count', value: guardOptions.length },
+              ]
+            : [
+                { label: 'Items Queued', value: returnItems.length },
+                { label: 'Outstanding Records', value: outstandingOptions.length },
+              ]
+        }
+        actions={
+          <div className="flex bg-slate-900/40 dark:bg-slate-950/60 backdrop-blur-md p-1.5 rounded-xl border border-white/10 dark:border-white/5">
             <button
               type="button"
               onClick={() => setActiveTab('issue')}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
                 activeTab === 'issue'
-                  ? 'bg-white text-emerald-700 shadow-md'
-                  : 'text-white/80 hover:text-white hover:bg-white/10'
+                  ? 'bg-emerald-500 text-white shadow-md'
+                  : 'text-slate-300 hover:text-white hover:bg-white/10'
               }`}
             >
               <Package className="h-3.5 w-3.5" />
@@ -242,19 +243,16 @@ export default function BulkOperationsPage() {
               onClick={() => setActiveTab('return')}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
                 activeTab === 'return'
-                  ? 'bg-white text-blue-700 shadow-md'
-                  : 'text-white/80 hover:text-white hover:bg-white/10'
+                  ? 'bg-blue-500 text-white shadow-md'
+                  : 'text-slate-300 hover:text-white hover:bg-white/10'
               }`}
             >
               <ArrowRight className="h-3.5 w-3.5" />
               Bulk Return
             </button>
           </div>
-        </div>
-
-        {/* Decorative background glow */}
-        <div className="absolute -top-24 -right-24 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none" />
-      </div>
+        }
+      />
 
       {/* Notifications */}
       {error && (

@@ -11,6 +11,7 @@ import { useToast } from '@/components/ui/toast'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { NotificationSettings } from '@/components/NotificationSettings'
+import { PageHeader } from '@/components/ui/page-header'
 
 export default function SettingsPage() {
   const { data: session } = useSession()
@@ -148,24 +149,18 @@ export default function SettingsPage() {
 
   return (
     <div className="space-y-8">
-      {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-gray-950 to-slate-900 border border-slate-800 p-6 md:p-8 text-white shadow-xl">
-        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 30% 50%, rgba(107, 114, 128, 0.3) 0%, transparent 60%), radial-gradient(circle at 70% 50%, rgba(156, 163, 175, 0.2) 0%, transparent 60%)' }} />
-        <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-gray-500/30 text-gray-200 border border-gray-400/30">
-                Configuration
-              </span>
-            </div>
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-3">
-              <Settings className="h-7 w-7 text-gray-400" />
-              System Settings
-            </h1>
-            <p className="text-sm text-slate-300 mt-1">Configure system-wide settings</p>
-          </div>
-        </div>
-      </div>
+      {/* Modern Hero Header */}
+      <PageHeader
+        icon={Settings}
+        badge="System Configuration"
+        title="System Settings"
+        description="Configure system-wide operational parameters, categories, and account preferences."
+        color="slate"
+        stats={[
+          { label: 'Account Role', value: session?.user?.role === 'SECURITY_SUPERVISOR' ? 'Supervisor' : 'Custodian' },
+          { label: 'Categories Configured', value: categories.length },
+        ]}
+      />
 
       {/* User Profile Card */}
       <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
