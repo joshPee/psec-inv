@@ -21,6 +21,7 @@ import {
   Package, RefreshCw, Minus, Download, ArrowUpDown, ArrowUp, ArrowDown, 
   Search, AlertTriangle, Layers, Filter 
 } from 'lucide-react'
+import { PageHeader } from '@/components/ui/page-header'
 
 type StatusFilterType = 'ALL' | 'AVAILABLE' | 'LOW_STOCK' | 'DEPLETED' | 'ISSUED'
 type SortKey = 'itemCode' | 'itemName' | 'category' | 'totalQuantity' | 'availableQuantity' | 'issuedQuantity'
@@ -436,34 +437,31 @@ export default function InventoryClient({ equipment, categories, initialSearch, 
   return (
     <div className="space-y-6">
 
-      {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-teal-950 to-slate-900 border border-slate-800 p-6 md:p-8 text-white shadow-xl">
-        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 30% 50%, rgba(20, 184, 166, 0.3) 0%, transparent 60%), radial-gradient(circle at 70% 50%, rgba(45, 212, 191, 0.2) 0%, transparent 60%)' }} />
-        <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-teal-500/30 text-teal-200 border border-teal-400/30">
-                Master Catalog
-              </span>
-            </div>
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-3">
-              <Package className="h-7 w-7 text-teal-400" />
-              Equipment Inventory
-            </h1>
-            <p className="text-sm text-slate-300 mt-1">Manage and track security equipment, gear, and supplies</p>
-          </div>
+      {/* Modern Page Header */}
+      <PageHeader
+        icon={Package}
+        title="Equipment Inventory"
+        subtitle="Master catalog tracking active stock levels, deployment custody, and operational readiness."
+        badge="Master Catalog"
+        color="teal"
+        stats={[
+          { label: 'Total Catalog', value: stats.total },
+          { label: 'In Stock', value: stats.available, highlight: true },
+          { label: 'Low Stock', value: stats.lowStock, highlight: stats.lowStock > 0 },
+        ]}
+        actions={
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
               onClick={exportFilteredToCSV}
-              className="bg-white/10 hover:bg-white/20 text-white border-white/20 font-medium shadow-sm"
+              className="bg-white/10 hover:bg-white/20 text-white border-white/20 font-medium shadow-sm transition-all"
             >
               <Download className="h-4 w-4 mr-2" />
               Export CSV
             </Button>
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogTrigger asChild>
-                <Button className="bg-teal-600 hover:bg-teal-700 text-white font-medium shadow-sm">
+                <Button className="bg-teal-600 hover:bg-teal-500 text-white font-medium shadow-md transition-all">
                   <Plus className="h-4 w-4 mr-2" />
                   Add Equipment
                 </Button>
@@ -586,8 +584,8 @@ export default function InventoryClient({ equipment, categories, initialSearch, 
             </DialogContent>
           </Dialog>
         </div>
-      </div>
-    </div>
+      }
+    />
 
       {/* Issue Equipment Dialog */}
       <Dialog open={isIssueDialogOpen} onOpenChange={setIsIssueDialogOpen}>
