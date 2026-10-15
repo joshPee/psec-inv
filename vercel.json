@@ -1,5 +1,5 @@
 {
-  "buildCommand": "cd cocobod-app && npx prisma generate && next build",
+  "buildCommand": "cd cocobod-app && npm run build",
   "outputDirectory": "cocobod-app/.next",
   "framework": "nextjs",
   "installCommand": "cd cocobod-app && npm install"
