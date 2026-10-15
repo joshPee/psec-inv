@@ -1,3 +1,2 @@
-#!/bin/bash
-cd cocobod-app
-npm install
+#!/usr/bin/env bash
+cd cocobod-app && npm install
