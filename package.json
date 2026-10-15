@@ -9,7 +9,6 @@
     "build:with-db": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
-    "postinstall": "prisma generate",
     "contract:emit": "prisma contract emit",
     "seed": "ts-node prisma/seed.ts"
   },
