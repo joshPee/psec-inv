@@ -1,0 +1,6 @@
+{
+  "buildCommand": "./build.sh",
+  "outputDirectory": "cocobod-app/.next",
+  "framework": "nextjs",
+  "installCommand": "./install.sh"
+}
