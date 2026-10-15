@@ -1,6 +1,6 @@
 {
-  "buildCommand": "bash build.sh",
+  "buildCommand": "cd cocobod-app; npm run build",
   "outputDirectory": "cocobod-app/.next",
   "framework": "nextjs",
-  "installCommand": "bash install.sh"
+  "installCommand": "cd cocobod-app; npm install"
 }
