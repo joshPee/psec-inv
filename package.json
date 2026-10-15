@@ -3,8 +3,8 @@
   "version": "1.0.1",
   "private": true,
   "scripts": {
-    "build": "cd cocobod-app && npm run build",
-    "vercel-build": "cd cocobod-app && npm run build",
-    "postinstall": "cd cocobod-app && DATABASE_URL=\"postgresql://dummy:dummy@localhost:5432/dummy\" npm install"
+    "build": "cd cocobod-app && DATABASE_URL=\"postgresql://dummy:dummy@localhost:5432/dummy\" npx prisma generate && npm run build",
+    "vercel-build": "cd cocobod-app && DATABASE_URL=\"postgresql://dummy:dummy@localhost:5432/dummy\" npx prisma generate && npm run build",
+    "postinstall": "cd cocobod-app && npm install"
   }
 }
