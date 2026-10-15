@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
+    "vercel-build": "prisma generate && next build",
+    "postinstall": "prisma generate",
     "build:with-db": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
