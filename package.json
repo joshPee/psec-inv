@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "build": "cd cocobod-app && npm run build",
-    "vercel-build": "cd cocobod-app && npm run build"
+    "vercel-build": "cd cocobod-app && npm run build",
+    "postinstall": "cd cocobod-app && DATABASE_URL=\"postgresql://dummy:dummy@localhost:5432/dummy\" npm install"
   }
 }

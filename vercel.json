@@ -1,6 +1,5 @@
 {
-  "buildCommand": "bash -c 'cd cocobod-app && export DATABASE_URL=\"postgresql://dummy:dummy@localhost:5432/dummy\" && npm install && npm run build'",
+  "buildCommand": "npm run build",
   "outputDirectory": "cocobod-app/.next",
-  "framework": "nextjs",
-  "installCommand": "echo 'Skipping install, handled by build script'"
+  "framework": "nextjs"
 }
